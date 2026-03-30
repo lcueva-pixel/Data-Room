@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Eye, EyeOff, LogIn, Building2 } from 'lucide-react';
+import { Eye, EyeOff, LogIn } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
 export function LoginForm() {
@@ -42,9 +42,11 @@ export function LoginForm() {
 
           {/* Header */}
           <div className="flex flex-col items-center mb-8">
-            <div className="w-14 h-14 bg-blue-900 rounded-xl flex items-center justify-center mb-4 shadow-md">
-              <Building2 className="w-8 h-8 text-white" />
-            </div>
+            <img
+              src="/cex_logo.png"
+              alt="Logo"
+              className="w-14 h-14 rounded-xl object-contain mb-4 shadow-md"
+            />
             <h1 className="text-2xl font-bold text-slate-800 tracking-tight">
               Data Room
             </h1>
@@ -155,7 +157,7 @@ export function LoginForm() {
 
           {/* Footer */}
           <p className="text-center text-xs text-slate-400 mt-8">
-            © {new Date().getFullYear()} Construex — Acceso restringido
+            © {new Date().getFullYear()} Data Room — Acceso restringido
           </p>
         </div>
       </div>

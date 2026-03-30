@@ -2,12 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import { useTheme } from 'next-themes';
-import { ChevronRight, UserCircle2, LogOut, Sun, Moon } from 'lucide-react';
+import { ChevronRight, UserCircle2, LogOut, Sun, Moon, Menu } from 'lucide-react';
 
 interface TopBarProps {
   activeTitle: string;
   rolId: number | null;
   onLogout: () => void;
+  onMenuToggle?: () => void;
 }
 
 const ROL_LABELS: Record<number, string> = {
@@ -15,7 +16,7 @@ const ROL_LABELS: Record<number, string> = {
   2: 'Empleado',
 };
 
-export function TopBar({ activeTitle, rolId, onLogout }: TopBarProps) {
+export function TopBar({ activeTitle, rolId, onLogout, onMenuToggle }: TopBarProps) {
   const rolLabel = rolId ? (ROL_LABELS[rolId] ?? 'Usuario') : 'Usuario';
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
@@ -25,16 +26,30 @@ export function TopBar({ activeTitle, rolId, onLogout }: TopBarProps) {
   const isDark = resolvedTheme === 'dark';
 
   return (
-    <header className="h-16 flex-shrink-0 bg-white dark:bg-sidebar-hover border-b border-slate-200 dark:border-white/10 flex items-center justify-between px-6">
-      {/* Breadcrumbs */}
-      <nav className="flex items-center gap-1.5 text-sm">
-        <span className="text-slate-400 dark:text-gray-500">Dashboard</span>
-        <ChevronRight className="w-4 h-4 text-slate-300 dark:text-gray-600" />
-        <span className="text-slate-700 dark:text-gray-100 font-medium">{activeTitle}</span>
-      </nav>
+    <header className="h-16 flex-shrink-0 bg-white dark:bg-sidebar-hover border-b border-slate-200 dark:border-white/10 flex items-center justify-between px-4 sm:px-6">
+      {/* Lado izquierdo: hamburguesa + breadcrumbs */}
+      <div className="flex items-center gap-2">
+        {/* Hamburguesa — solo visible en móvil */}
+        {onMenuToggle && (
+          <button
+            onClick={onMenuToggle}
+            className="p-2 -ml-2 rounded-lg text-slate-500 dark:text-gray-400 hover:bg-slate-100 dark:hover:bg-sidebar-main transition-colors lg:hidden"
+            aria-label="Abrir menú"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+        )}
+
+        {/* Breadcrumbs */}
+        <nav className="flex items-center gap-1.5 text-sm">
+          <span className="text-slate-400 dark:text-gray-500 hidden sm:inline">Dashboard</span>
+          <ChevronRight className="w-4 h-4 text-slate-300 dark:text-gray-600 hidden sm:block" />
+          <span className="text-slate-700 dark:text-gray-100 font-medium truncate">{activeTitle}</span>
+        </nav>
+      </div>
 
       {/* Acciones */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 sm:gap-3">
         {/* Toggle theme */}
         {mounted && (
           <button
@@ -47,7 +62,7 @@ export function TopBar({ activeTitle, rolId, onLogout }: TopBarProps) {
         )}
 
         {/* Info de usuario */}
-        <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-gray-400">
+        <div className="hidden sm:flex items-center gap-2 text-sm text-slate-600 dark:text-gray-400">
           <UserCircle2 className="w-5 h-5 text-slate-400 dark:text-gray-500" />
           <span className="font-medium">{rolLabel}</span>
         </div>

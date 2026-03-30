@@ -12,16 +12,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const router = useRouter();
   const { logout } = useAuth();
   const { reports, isLoading } = useReports();
-    const [mounted, setMounted] = useState(false);
-    const [rolId, setRolId] = useState<number | null>(null);
+  const [mounted, setMounted] = useState(false);
+  const [rolId, setRolId] = useState<number | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
-    useEffect(() => {
-      setMounted(true);
-      setRolId(getRolId());
-    }, []);
+  useEffect(() => {
+    setMounted(true);
+    setRolId(getRolId());
+  }, []);
 
   // Guard client-side: redirigir si no es admin
-
   useEffect(() => {
     if (mounted && rolId !== 1) {
       router.replace('/dashboard');
@@ -41,6 +41,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         onReportSelect={() => router.push('/dashboard')}
         onLogout={logout}
         rolId={rolId}
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
       />
 
       {/* Área principal */}
@@ -49,9 +51,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           activeTitle="Administración"
           rolId={rolId}
           onLogout={logout}
+          onMenuToggle={() => setSidebarOpen((v) => !v)}
         />
 
-        <main className="flex-1 overflow-y-auto p-6">{children}</main>
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6">{children}</main>
       </div>
     </div>
   );

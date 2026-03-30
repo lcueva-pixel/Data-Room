@@ -3,7 +3,7 @@ import './globals.css';
 import { Providers } from '@/components/Providers';
 
 export const metadata: Metadata = {
-  title: 'Data Room — Portal de Reportes',
+  title: 'Data Room',
   description: 'Sistema de visualización de reportes Looker Studio',
 };
 
