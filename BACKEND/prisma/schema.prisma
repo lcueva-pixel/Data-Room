@@ -1,0 +1,98 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Role {
+  id             Int    @id @default(autoincrement())
+  rolDescripcion String @unique @map("rol_descripcion") @db.VarChar(50)
+
+  usuarios      User[]
+  reportesRoles ReportRole[]
+
+  @@map("cex_roles")
+}
+
+model User {
+  id             Int      @id @default(autoincrement())
+  nombreCompleto String   @map("nombre_completo") @db.VarChar(100)
+  email          String   @unique @db.VarChar(150)
+  passwordHash   String   @map("password_hash")
+  rolId          Int      @map("rol_id")
+  activo         Boolean  @default(true)
+  fechaCreacion  DateTime @default(now()) @map("fecha_creacion") @db.Timestamptz
+
+  rol             Role            @relation(fields: [rolId], references: [id])
+  auditAccesses   AuditAccess[]
+  logActivities   LogActivity[]
+  reportViewLogs  ReportViewLog[]
+
+  @@map("cex_usuarios")
+}
+
+model Report {
+  id            Int      @id @default(autoincrement())
+  titulo        String   @db.VarChar(100)
+  descripcion   String?
+  urlIframe     String   @map("url_iframe")
+  activo        Boolean  @default(true)
+  fechaRegistro DateTime @default(now()) @map("fecha_registro") @db.Timestamptz
+
+  reportesRoles  ReportRole[]
+  reportViewLogs ReportViewLog[]
+
+  @@map("cex_reportes")
+}
+
+model ReportRole {
+  reporteId Int @map("reporte_id")
+  rolId     Int @map("rol_id")
+
+  reporte Report @relation(fields: [reporteId], references: [id], onDelete: Cascade)
+  rol     Role   @relation(fields: [rolId], references: [id], onDelete: Cascade)
+
+  @@id([reporteId, rolId])
+  @@map("cex_reportes_roles")
+}
+
+model AuditAccess {
+  id        Int      @id @default(autoincrement())
+  usuarioId Int      @map("usuario_id")
+  fechaHora DateTime @default(now()) @map("fecha_hora") @db.Timestamptz
+  ipAddress String?  @map("ip_address") @db.VarChar(45)
+  userAgent String?  @map("user_agent")
+
+  usuario User @relation(fields: [usuarioId], references: [id])
+
+  @@map("cex_auditoria_accesos")
+}
+
+model LogActivity {
+  id        Int      @id @default(autoincrement())
+  usuarioId Int      @map("usuario_id")
+  accion    String   @db.VarChar(100)
+  detalle   String?
+  fechaHora DateTime @default(now()) @map("fecha_hora") @db.Timestamptz
+
+  usuario User @relation(fields: [usuarioId], references: [id])
+
+  @@map("cex_log_actividades")
+}
+
+model ReportViewLog {
+  id        Int      @id @default(autoincrement())
+  usuarioId Int      @map("usuario_id")
+  reporteId Int      @map("reporte_id")
+  duracion  Int      @map("duracion_segundos")
+  fechaHora DateTime @default(now()) @map("fecha_hora") @db.Timestamptz
+
+  usuario User   @relation(fields: [usuarioId], references: [id])
+  reporte Report @relation(fields: [reporteId], references: [id])
+
+  @@map("cex_log_visualizaciones")
+}

@@ -1,0 +1,82 @@
+-- =============================================================
+-- SCRIPT DE CREACIÓN DE BASE DE DATOS: SISTEMA LOOKER E-DASH
+-- POSTGRESQL 18 COMPATIBLE
+-- =============================================================
+
+-- 1. TABLA DE ROLES
+-- Define los niveles de acceso
+CREATE TABLE IF NOT EXISTS cex_roles (
+    id SERIAL PRIMARY KEY,
+    rol_descripcion VARCHAR(50) NOT NULL UNIQUE
+);
+
+-- Insertar roles iniciales
+INSERT INTO cex_roles (rol_descripcion) 
+VALUES ('administrador'), ('empleado')
+ON CONFLICT (rol_descripcion) DO NOTHING;
+
+-- 2. TABLA DE USUARIOS
+-- Almacena credenciales y vinculación con roles
+CREATE TABLE IF NOT EXISTS cex_usuarios (
+    id SERIAL PRIMARY KEY,
+    nombre_completo VARCHAR(100) NOT NULL,
+    email VARCHAR(150) NOT NULL UNIQUE,
+    password_hash TEXT NOT NULL, -- El hash se genera en el Backend
+    rol_id INTEGER NOT NULL,
+    activo BOOLEAN DEFAULT TRUE,
+    fecha_creacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    
+    CONSTRAINT fk_rol FOREIGN KEY (rol_id) REFERENCES cex_roles(id) ON DELETE RESTRICT
+);
+
+
+-- 3. TABLA DE REPORTES (LOOKER STUDIO)
+-- Aquí guardarás los enlaces de inserción (Embed URLs)
+CREATE TABLE IF NOT EXISTS cex_reportes (
+    id SERIAL PRIMARY KEY,
+    titulo VARCHAR(100) NOT NULL,
+    descripcion TEXT,
+    url_iframe TEXT NOT NULL,
+    rol_minimo_id INTEGER NOT NULL, -- Define quién puede verlo
+    activo BOOLEAN DEFAULT TRUE,
+    fecha_registro TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    
+    CONSTRAINT fk_rol_reporte FOREIGN KEY (rol_minimo_id) REFERENCES cex_roles(id)
+);
+
+-- 4. TABLA DE AUDITORÍA DE ACCESOS (LOGINS)
+-- Registra cada inicio de sesión exitoso
+CREATE TABLE IF NOT EXISTS cex_auditoria_accesos (
+    id SERIAL PRIMARY KEY,
+    usuario_id INTEGER NOT NULL,
+    fecha_hora TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    ip_address VARCHAR(45),
+    user_agent TEXT, -- Información del navegador/dispositivo
+    
+    CONSTRAINT fk_usuario_auditoria FOREIGN KEY (usuario_id) REFERENCES cex_usuarios(id) ON DELETE CASCADE
+);
+
+-- 5. TABLA DE LOG DE ACTIVIDADES
+-- Registra acciones específicas dentro de la plataforma
+CREATE TABLE IF NOT EXISTS cex_log_actividades (
+    id SERIAL PRIMARY KEY,
+    usuario_id INTEGER NOT NULL,
+    accion VARCHAR(100) NOT NULL, -- Ej: 'VER_REPORTE', 'EDITAR_USUARIO'
+    detalle TEXT,                -- Ej: 'Visualizó el reporte de Ventas Trimestrales'
+    fecha_hora TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    
+    CONSTRAINT fk_usuario_actividad FOREIGN KEY (usuario_id) REFERENCES cex_usuarios(id) ON DELETE CASCADE
+);
+
+-- =============================================================
+-- EJEMPLOS DE CONSULTAS ÚTILES PARA EL ADMINISTRADOR
+-- =============================================================
+
+-- Ver quién se ha conectado recientemente:
+-- SELECT u.nombre_completo, a.fecha_hora, a.ip_address 
+-- FROM cex_auditoria_accesos a 
+-- JOIN cex_usuarios u ON a.usuario_id = u.id 
+-- ORDER BY a.fecha_hora DESC;
+
+-- Ver reportes disponibles según el rol del usuario logueado:
+-- SELECT titulo, url_iframe FROM cex_reportes WHERE rol_minimo_id = $ID_DEL_ROL_USUARIO;

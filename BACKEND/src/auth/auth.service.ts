@@ -1,0 +1,46 @@
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcrypt';
+import { PrismaService } from '../prisma/prisma.service';
+
+@Injectable()
+export class AuthService {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly jwtService: JwtService,
+  ) {}
+
+  async validateUser(
+    email: string,
+    password: string,
+    ipAddress: string,
+    userAgent: string,
+  ) {
+    const user = await this.prisma.user.findFirst({
+      where: { email, activo: true },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException('Credenciales incorrectas');
+    }
+
+    const passwordValid = await bcrypt.compare(password, user.passwordHash);
+    if (!passwordValid) {
+      throw new UnauthorizedException('Credenciales incorrectas');
+    }
+
+    await this.prisma.auditAccess.create({
+      data: { usuarioId: user.id, ipAddress, userAgent },
+    });
+
+    return user;
+  }
+
+  async login(user: { id: number; rolId: number }) {
+    const payload = { sub: user.id, rol_id: user.rolId };
+    return {
+      access_token: this.jwtService.sign(payload),
+      rol_id: user.rolId,
+    };
+  }
+}
