@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import '@/app/sidebar-scrollbar.css';
 import { usePathname } from 'next/navigation';
-import { Building2, BarChart2, LogOut, Settings, ShieldCheck, ClipboardList, Users, LayoutDashboard } from 'lucide-react';
+import { BarChart2, LogOut, Settings, ShieldCheck, ClipboardList, Users, LayoutDashboard } from 'lucide-react';
 import clsx from 'clsx';
 import type { Report } from '@/types/report.types';
 
@@ -49,13 +49,12 @@ export function Sidebar({
 
       {/* ── Logo ─────────────────────────────────────────────────────────── */}
       <div className="flex items-center gap-3 px-5 py-6 border-b border-white/10">
-        <div className="w-9 h-9 bg-white/10 rounded-lg flex items-center justify-center">
-          <Building2 className="w-5 h-5 text-white" />
-        </div>
-        <div>
-          <p className="text-white font-bold text-sm tracking-wider">CONSTRUEX</p>
-          <p className="text-gray-400 text-xs">Portal de Reportes</p>
-        </div>
+        <img
+          src="/cex_logo.png"
+          alt="Logo"
+          className="w-9 h-9 rounded-lg object-contain"
+        />
+        <p className="text-white font-bold text-sm tracking-wider">DATA ROOM</p>
       </div>
 
       {/* ── Navegación ───────────────────────────────────────────────────── */}
