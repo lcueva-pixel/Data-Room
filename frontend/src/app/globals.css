@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+/* Tailwind v4: class-based dark mode (next-themes sets .dark on <html>) */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ── Sidebar dark-theme tokens ─────────────────────────────────────────────
+   Tailwind v4: @theme registers --color-* as utility-generating variables.
+   :root exposes the raw values for any CSS-level usage.
+   ────────────────────────────────────────────────────────────────────────── */
+@theme {
+  --color-sidebar-main:   var(--sidebar-main);
+  --color-sidebar-hover:  var(--sidebar-hover);
+  --color-sidebar-accent: var(--sidebar-accent);
+}
+
+:root {
+  --sidebar-main:   #1c252e;
+  --sidebar-hover:  #151c24;
+  --sidebar-accent: #68d6e3;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}

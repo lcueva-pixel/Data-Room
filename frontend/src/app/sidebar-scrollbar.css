@@ -1,0 +1,16 @@
+/* Minimalist custom scrollbar for sidebar navigation */
+.sidebar-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  background: transparent;
+}
+
+
+.sidebar-scrollbar::-webkit-scrollbar-thumb {
+  background: #b0b4ba; /* gris claro, similar al de la imagen */
+  border-radius: 6px;
+}
+
+.sidebar-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #b0b4ba transparent;
+}
