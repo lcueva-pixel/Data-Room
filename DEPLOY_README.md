@@ -16,6 +16,12 @@
    - Deploy inicial y actualizaciones
    - Script de deploy rápido
 
+3. **[DEPLOY_HTTPS.md](DEPLOY_HTTPS.md)** - Configuración HTTPS con Let's Encrypt
+   - Configurar dominio y DNS
+   - Instalar y configurar Certbot
+   - Generar certificado SSL
+   - Renovación automática
+
 ### Archivos de Configuración
 
 - **[ecosystem.config.js](ecosystem.config.js)** - PM2 process manager
