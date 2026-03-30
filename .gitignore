@@ -1,0 +1,28 @@
+# Root .gitignore - Data Room
+
+# PM2 logs
+logs/
+*.log
+
+# PM2 ecosystem generado dinámicamente (si aplica)
+.pm2/
+
+# Scripts locales de deploy temporales
+deploy-local.sh
+
+# Backups
+*.backup
+*.bak
+
+# Editor configs locales
+.vscode/settings.json
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env files (por si acaso)
+.env
+.env.local
+.env.production.local
