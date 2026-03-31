@@ -38,4 +38,9 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Boolean)
 ], CreateReportDto.prototype, "activo", void 0);
+__decorate([
+    (0, class_validator_1.IsInt)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Object)
+], CreateReportDto.prototype, "padreId", void 0);
 //# sourceMappingURL=create-report.dto.js.map

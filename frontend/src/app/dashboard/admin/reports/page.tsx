@@ -71,7 +71,8 @@ export default function AdminReportsPage() {
       <Modal
         isOpen={showForm}
         onClose={handleCancel}
-        title={editingReport ? 'Editar Reporte' : 'Nuevo Reporte'}
+        title={editingReport ? `Editar: ${editingReport.titulo}` : 'Nuevo Reporte'}
+        maxWidth={editingReport ? 'lg' : 'md'}
       >
         <ReportForm
           initialValues={editingReport ?? undefined}

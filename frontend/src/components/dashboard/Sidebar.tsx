@@ -1,9 +1,10 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import '@/app/sidebar-scrollbar.css';
 import { usePathname } from 'next/navigation';
-import { BarChart2, LogOut, Settings, ShieldCheck, ClipboardList, Users, LayoutDashboard, X } from 'lucide-react';
+import { BarChart2, LogOut, Settings, ShieldCheck, ClipboardList, Users, LayoutDashboard, X, ChevronDown } from 'lucide-react';
 import clsx from 'clsx';
 import type { Report } from '@/types/report.types';
 
@@ -18,8 +19,6 @@ interface SidebarProps {
   onClose: () => void;
 }
 
-// Clases base compartidas por todos los ítems de navegación.
-// border-l-4 siempre presente → previene layout shift al activarse el acento.
 const NAV_BASE =
   'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors border-l-4';
 
@@ -29,6 +28,68 @@ const NAV_ACTIVE =
 const NAV_INACTIVE =
   'text-gray-400 border-l-transparent hover:bg-sidebar-hover hover:border-l-sidebar-accent hover:text-white';
 
+// ── Componente recursivo para reportes con hijos ──────────────────────
+function SidebarReportItem({
+  report,
+  selectedReport,
+  onSelect,
+  expandedIds,
+  onToggleExpand,
+  depth = 0,
+}: {
+  report: Report;
+  selectedReport: Report | null;
+  onSelect: (r: Report) => void;
+  expandedIds: Set<number>;
+  onToggleExpand: (id: number) => void;
+  depth?: number;
+}) {
+  const hasChildren = report.children && report.children.length > 0;
+  const isExpanded = expandedIds.has(report.id);
+  const isActive = selectedReport?.id === report.id;
+
+  return (
+    <div>
+      <button
+        onClick={() => {
+          if (hasChildren) onToggleExpand(report.id);
+          onSelect(report);
+        }}
+        className={clsx(NAV_BASE, 'w-full text-left', isActive ? NAV_ACTIVE : NAV_INACTIVE)}
+        style={{ paddingLeft: `${12 + depth * 16}px` }}
+      >
+        <BarChart2 className={clsx('flex-shrink-0', depth > 0 ? 'w-3.5 h-3.5' : 'w-4 h-4')} />
+        <span className="truncate flex-1">{report.titulo}</span>
+        {hasChildren && (
+          <ChevronDown
+            className={clsx(
+              'w-3.5 h-3.5 transition-transform duration-200 flex-shrink-0',
+              isExpanded && 'rotate-180',
+            )}
+          />
+        )}
+      </button>
+
+      {hasChildren && isExpanded && (
+        <div className="border-l border-white/10 ml-5">
+          {report.children!.map((child) => (
+            <SidebarReportItem
+              key={child.id}
+              report={child}
+              selectedReport={selectedReport}
+              onSelect={onSelect}
+              expandedIds={expandedIds}
+              onToggleExpand={onToggleExpand}
+              depth={depth + 1}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Sidebar principal ─────────────────────────────────────────────────
 export function Sidebar({
   reports,
   isLoading,
@@ -42,13 +103,44 @@ export function Sidebar({
   const pathname = usePathname();
   const isAdmin = rolId === 1;
 
+  // ── Acordeón ────────────────────────────────────────────────────────
+  const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
+
+  const toggleExpand = (id: number) => {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  // Auto-expandir todos los ancestros del reporte seleccionado
+  useEffect(() => {
+    if (!selectedReport) return;
+    const idsToExpand: number[] = [];
+    const findAncestors = (items: Report[], targetId: number): boolean => {
+      for (const r of items) {
+        if (r.id === targetId) return true;
+        if (r.children?.length && findAncestors(r.children, targetId)) {
+          idsToExpand.push(r.id);
+          return true;
+        }
+      }
+      return false;
+    };
+    findAncestors(reports, selectedReport.id);
+    if (idsToExpand.length > 0) {
+      setExpandedIds((prev) => new Set([...prev, ...idsToExpand]));
+    }
+  }, [selectedReport, reports]);
+
   const adminLinks = [
     { href: '/dashboard/admin/reports', label: 'Gestión de Reportes', icon: ClipboardList },
     { href: '/dashboard/admin/audit',   label: 'Auditoría',           icon: ShieldCheck  },
     { href: '/dashboard/admin/users',   label: 'Usuarios',            icon: Users        },
   ];
 
-  // Cierra el sidebar en móvil al navegar
   const handleReportSelect = (report: Report) => {
     onReportSelect(report);
     onClose();
@@ -56,7 +148,7 @@ export function Sidebar({
 
   return (
     <>
-      {/* ── Overlay (solo móvil) ───────────────────────────────────────── */}
+      {/* ── Overlay (solo móvil) ─────────────────────────────────────── */}
       {isOpen && (
         <div
           className="fixed inset-0 z-40 bg-black/50 lg:hidden"
@@ -65,28 +157,21 @@ export function Sidebar({
         />
       )}
 
-      {/* ── Sidebar ────────────────────────────────────────────────────── */}
+      {/* ── Sidebar ──────────────────────────────────────────────────── */}
       <aside
         className={clsx(
           'w-60 bg-sidebar-main flex flex-col h-full flex-shrink-0',
-          // Móvil: fixed slide-over
           'fixed z-50 top-0 left-0 transition-transform duration-300 ease-in-out',
           isOpen ? 'translate-x-0' : '-translate-x-full',
-          // Desktop: static, siempre visible
           'lg:relative lg:translate-x-0',
         )}
       >
-        {/* ── Logo + Close ───────────────────────────────────────────────── */}
+        {/* ── Logo + Close ─────────────────────────────────────────── */}
         <div className="flex items-center justify-between px-5 py-6 border-b border-white/10">
           <div className="flex items-center gap-3">
-            <img
-              src="/cex_logo.png"
-              alt="Logo"
-              className="w-9 h-9 rounded-lg object-contain"
-            />
+            <img src="/cex_logo.png" alt="Logo" className="w-9 h-9 rounded-lg object-contain" />
             <p className="text-white font-bold text-sm tracking-wider">DATA ROOM</p>
           </div>
-          {/* Botón X solo visible en móvil */}
           <button
             onClick={onClose}
             className="p-1 text-gray-400 hover:text-white transition-colors lg:hidden"
@@ -96,7 +181,7 @@ export function Sidebar({
           </button>
         </div>
 
-        {/* ── Navegación ───────────────────────────────────────────────── */}
+        {/* ── Navegación ───────────────────────────────────────────── */}
         <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1 sidebar-scrollbar">
 
           {/* Overview */}
@@ -131,17 +216,14 @@ export function Sidebar({
             <p className="text-gray-500 text-xs px-2 py-3">Sin reportes disponibles</p>
           ) : (
             reports.map((report) => (
-              <button
+              <SidebarReportItem
                 key={report.id}
-                onClick={() => handleReportSelect(report)}
-                className={clsx(
-                  NAV_BASE, 'w-full text-left',
-                  selectedReport?.id === report.id ? NAV_ACTIVE : NAV_INACTIVE,
-                )}
-              >
-                <BarChart2 className="w-4 h-4 flex-shrink-0" />
-                <span className="truncate">{report.titulo}</span>
-              </button>
+                report={report}
+                selectedReport={selectedReport}
+                onSelect={handleReportSelect}
+                expandedIds={expandedIds}
+                onToggleExpand={toggleExpand}
+              />
             ))
           )}
 
@@ -170,11 +252,9 @@ export function Sidebar({
           )}
         </nav>
 
-        {/* ── Zona inferior ──────────────────────────────────────────────── */}
+        {/* ── Zona inferior ────────────────────────────────────────── */}
         <div className="px-3 py-4 border-t border-white/10 space-y-1">
-          <button
-            className={clsx(NAV_BASE, 'w-full', NAV_INACTIVE)}
-          >
+          <button className={clsx(NAV_BASE, 'w-full', NAV_INACTIVE)}>
             <Settings className="w-4 h-4" />
             <span>Configuración</span>
           </button>

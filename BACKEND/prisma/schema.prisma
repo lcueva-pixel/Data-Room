@@ -43,6 +43,11 @@ model Report {
   activo        Boolean  @default(true)
   fechaRegistro DateTime @default(now()) @map("fecha_registro") @db.Timestamptz
 
+  // ─── Jerarquía recursiva ───────────────────────────
+  padreId  Int?     @map("padre_id")
+  padre    Report?  @relation("ReportHierarchy", fields: [padreId], references: [id], onDelete: SetNull)
+  children Report[] @relation("ReportHierarchy")
+
   reportesRoles  ReportRole[]
   reportViewLogs ReportViewLog[]
 

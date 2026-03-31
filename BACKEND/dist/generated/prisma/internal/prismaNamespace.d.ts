@@ -770,6 +770,7 @@ export declare const ReportScalarFieldEnum: {
     readonly urlIframe: "urlIframe";
     readonly activo: "activo";
     readonly fechaRegistro: "fechaRegistro";
+    readonly padreId: "padreId";
 };
 export type ReportScalarFieldEnum = (typeof ReportScalarFieldEnum)[keyof typeof ReportScalarFieldEnum];
 export declare const ReportRoleScalarFieldEnum: {

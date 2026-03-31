@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useRoles } from '@/hooks/useRoles';
 import { useAdminReports } from '@/hooks/useAdminReports';
+import { ChildReportsSection } from '@/components/admin/ChildReportsSection';
 import type { Report } from '@/types/report.types';
 
 const reportSchema = z.object({
@@ -24,9 +25,10 @@ interface ReportFormProps {
   onSuccess: () => void;
   onCancel: () => void;
   initialValues?: Report;
+  lockedParentId?: number;
 }
 
-export function ReportForm({ onSuccess, onCancel, initialValues }: ReportFormProps) {
+export function ReportForm({ onSuccess, onCancel, initialValues, lockedParentId }: ReportFormProps) {
   const { roles, isLoading: rolesLoading } = useRoles();
   const { createReport, updateReport } = useAdminReports();
   const isEditing = !!initialValues;
@@ -52,12 +54,16 @@ export function ReportForm({ onSuccess, onCancel, initialValues }: ReportFormPro
 
   const onSubmit = async (data: ReportFormValues) => {
     try {
+      const payload = {
+        ...data,
+        ...(lockedParentId != null && { padreId: lockedParentId }),
+      };
+
       if (isEditing) {
-        await updateReport(initialValues.id, data);
+        await updateReport(initialValues.id, payload);
       } else {
-        await createReport(data);
+        await createReport(payload);
       }
-      // Disparar evento global para refrescar el menú lateral
       window.dispatchEvent(new Event('refresh-reports'));
       onSuccess();
     } catch {
@@ -66,11 +72,12 @@ export function ReportForm({ onSuccess, onCancel, initialValues }: ReportFormPro
   };
 
   const inputClass =
-    'w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent';
+    'w-full px-3 py-2 border border-slate-300 dark:border-white/20 rounded-lg text-sm bg-white dark:bg-sidebar-main text-slate-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-sidebar-accent/60 focus:border-transparent';
   const errorClass = 'text-red-500 text-xs mt-1';
-  const labelClass = 'block text-sm font-medium text-slate-700 mb-1';
+  const labelClass = 'block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1';
 
   return (
+    <>
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       {/* Título */}
       <div>
@@ -113,7 +120,7 @@ export function ReportForm({ onSuccess, onCancel, initialValues }: ReportFormPro
         {rolesLoading ? (
           <div className="space-y-2">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-5 w-40 bg-slate-200 rounded animate-pulse" />
+              <div key={i} className="h-5 w-40 bg-slate-200 dark:bg-white/10 rounded animate-pulse" />
             ))}
           </div>
         ) : (
@@ -121,14 +128,14 @@ export function ReportForm({ onSuccess, onCancel, initialValues }: ReportFormPro
             name="rolesIds"
             control={control}
             render={({ field }) => (
-              <div className="space-y-2 border border-slate-200 rounded-lg p-3 bg-slate-50">
+              <div className="space-y-2 border border-slate-200 dark:border-white/20 rounded-lg p-3 bg-slate-50 dark:bg-sidebar-main/60">
                 {roles.map((rol) => {
                   const checked = field.value.includes(rol.id);
                   return (
                     <label key={rol.id} className="flex items-center gap-2 cursor-pointer">
                       <input
                         type="checkbox"
-                        className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                        className="w-4 h-4 rounded border-slate-300 text-sidebar-accent focus:ring-sidebar-accent/60"
                         checked={checked}
                         onChange={(e) => {
                           if (e.target.checked) {
@@ -138,7 +145,7 @@ export function ReportForm({ onSuccess, onCancel, initialValues }: ReportFormPro
                           }
                         }}
                       />
-                      <span className="text-sm text-slate-700">{rol.rolDescripcion}</span>
+                      <span className="text-sm text-slate-700 dark:text-gray-300">{rol.rolDescripcion}</span>
                     </label>
                   );
                 })}
@@ -155,15 +162,15 @@ export function ReportForm({ onSuccess, onCancel, initialValues }: ReportFormPro
           {...register('activo')}
           type="checkbox"
           id="activo"
-          className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+          className="w-4 h-4 rounded border-slate-300 text-sidebar-accent focus:ring-sidebar-accent/60"
         />
-        <label htmlFor="activo" className="text-sm text-slate-700">
+        <label htmlFor="activo" className="text-sm text-slate-700 dark:text-gray-300">
           Reporte activo
         </label>
       </div>
 
       {errors.root && (
-        <p className="text-red-500 text-sm bg-red-50 px-3 py-2 rounded-lg">
+        <p className="text-red-500 text-sm bg-red-50 dark:bg-red-900/20 px-3 py-2 rounded-lg">
           {errors.root.message}
         </p>
       )}
@@ -172,18 +179,28 @@ export function ReportForm({ onSuccess, onCancel, initialValues }: ReportFormPro
         <button
           type="button"
           onClick={onCancel}
-          className="flex-1 px-4 py-2 border border-slate-300 rounded-lg text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+          className="flex-1 px-4 py-2 border border-slate-300 dark:border-white/20 rounded-lg text-sm text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-sidebar-main transition-colors"
         >
           Cancelar
         </button>
         <button
           type="submit"
           disabled={isSubmitting}
-          className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-60 transition-colors"
+          className="flex-1 px-4 py-2 bg-sidebar-main text-white rounded-lg text-sm font-medium hover:bg-sidebar-hover hover:ring-1 hover:ring-sidebar-accent/60 disabled:opacity-60 transition-all"
         >
-          {isSubmitting ? 'Guardando...' : isEditing ? '✓ Actualizar' : '✓ Guardar'}
+          {isSubmitting ? 'Guardando...' : isEditing ? 'Actualizar' : 'Guardar'}
         </button>
       </div>
+
     </form>
+
+      {/* ── Sub-reportes vinculados (FUERA del form, evita form anidado) ── */}
+      {isEditing && !lockedParentId && (
+        <>
+          <div className="border-t border-slate-200 dark:border-white/10 pt-4 mt-4" />
+          <ChildReportsSection parentId={initialValues!.id} parentTitle={initialValues!.titulo} />
+        </>
+      )}
+    </>
   );
 }

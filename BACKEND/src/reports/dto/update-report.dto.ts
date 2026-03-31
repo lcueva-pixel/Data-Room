@@ -21,4 +21,8 @@ export class UpdateReportDto {
   @IsBoolean()
   @IsOptional()
   activo?: boolean;
+
+  @IsInt()
+  @IsOptional()
+  padreId?: number | null;
 }

@@ -9,8 +9,8 @@ export declare class LogController {
         };
     } & {
         id: number;
-        fechaHora: Date;
         usuarioId: number;
+        fechaHora: Date;
         accion: string;
         detalle: string | null;
     })[]>;

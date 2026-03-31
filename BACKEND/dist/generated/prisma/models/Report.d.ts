@@ -10,9 +10,11 @@ export type AggregateReport = {
 };
 export type ReportAvgAggregateOutputType = {
     id: number | null;
+    padreId: number | null;
 };
 export type ReportSumAggregateOutputType = {
     id: number | null;
+    padreId: number | null;
 };
 export type ReportMinAggregateOutputType = {
     id: number | null;
@@ -21,6 +23,7 @@ export type ReportMinAggregateOutputType = {
     urlIframe: string | null;
     activo: boolean | null;
     fechaRegistro: Date | null;
+    padreId: number | null;
 };
 export type ReportMaxAggregateOutputType = {
     id: number | null;
@@ -29,6 +32,7 @@ export type ReportMaxAggregateOutputType = {
     urlIframe: string | null;
     activo: boolean | null;
     fechaRegistro: Date | null;
+    padreId: number | null;
 };
 export type ReportCountAggregateOutputType = {
     id: number;
@@ -37,13 +41,16 @@ export type ReportCountAggregateOutputType = {
     urlIframe: number;
     activo: number;
     fechaRegistro: number;
+    padreId: number;
     _all: number;
 };
 export type ReportAvgAggregateInputType = {
     id?: true;
+    padreId?: true;
 };
 export type ReportSumAggregateInputType = {
     id?: true;
+    padreId?: true;
 };
 export type ReportMinAggregateInputType = {
     id?: true;
@@ -52,6 +59,7 @@ export type ReportMinAggregateInputType = {
     urlIframe?: true;
     activo?: true;
     fechaRegistro?: true;
+    padreId?: true;
 };
 export type ReportMaxAggregateInputType = {
     id?: true;
@@ -60,6 +68,7 @@ export type ReportMaxAggregateInputType = {
     urlIframe?: true;
     activo?: true;
     fechaRegistro?: true;
+    padreId?: true;
 };
 export type ReportCountAggregateInputType = {
     id?: true;
@@ -68,6 +77,7 @@ export type ReportCountAggregateInputType = {
     urlIframe?: true;
     activo?: true;
     fechaRegistro?: true;
+    padreId?: true;
     _all?: true;
 };
 export type ReportAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -105,6 +115,7 @@ export type ReportGroupByOutputType = {
     urlIframe: string;
     activo: boolean;
     fechaRegistro: Date;
+    padreId: number | null;
     _count: ReportCountAggregateOutputType | null;
     _avg: ReportAvgAggregateOutputType | null;
     _sum: ReportSumAggregateOutputType | null;
@@ -124,6 +135,9 @@ export type ReportWhereInput = {
     urlIframe?: Prisma.StringFilter<"Report"> | string;
     activo?: Prisma.BoolFilter<"Report"> | boolean;
     fechaRegistro?: Prisma.DateTimeFilter<"Report"> | Date | string;
+    padreId?: Prisma.IntNullableFilter<"Report"> | number | null;
+    padre?: Prisma.XOR<Prisma.ReportNullableScalarRelationFilter, Prisma.ReportWhereInput> | null;
+    children?: Prisma.ReportListRelationFilter;
     reportesRoles?: Prisma.ReportRoleListRelationFilter;
     reportViewLogs?: Prisma.ReportViewLogListRelationFilter;
 };
@@ -134,6 +148,9 @@ export type ReportOrderByWithRelationInput = {
     urlIframe?: Prisma.SortOrder;
     activo?: Prisma.SortOrder;
     fechaRegistro?: Prisma.SortOrder;
+    padreId?: Prisma.SortOrderInput | Prisma.SortOrder;
+    padre?: Prisma.ReportOrderByWithRelationInput;
+    children?: Prisma.ReportOrderByRelationAggregateInput;
     reportesRoles?: Prisma.ReportRoleOrderByRelationAggregateInput;
     reportViewLogs?: Prisma.ReportViewLogOrderByRelationAggregateInput;
 };
@@ -147,6 +164,9 @@ export type ReportWhereUniqueInput = Prisma.AtLeast<{
     urlIframe?: Prisma.StringFilter<"Report"> | string;
     activo?: Prisma.BoolFilter<"Report"> | boolean;
     fechaRegistro?: Prisma.DateTimeFilter<"Report"> | Date | string;
+    padreId?: Prisma.IntNullableFilter<"Report"> | number | null;
+    padre?: Prisma.XOR<Prisma.ReportNullableScalarRelationFilter, Prisma.ReportWhereInput> | null;
+    children?: Prisma.ReportListRelationFilter;
     reportesRoles?: Prisma.ReportRoleListRelationFilter;
     reportViewLogs?: Prisma.ReportViewLogListRelationFilter;
 }, "id">;
@@ -157,6 +177,7 @@ export type ReportOrderByWithAggregationInput = {
     urlIframe?: Prisma.SortOrder;
     activo?: Prisma.SortOrder;
     fechaRegistro?: Prisma.SortOrder;
+    padreId?: Prisma.SortOrderInput | Prisma.SortOrder;
     _count?: Prisma.ReportCountOrderByAggregateInput;
     _avg?: Prisma.ReportAvgOrderByAggregateInput;
     _max?: Prisma.ReportMaxOrderByAggregateInput;
@@ -173,6 +194,7 @@ export type ReportScalarWhereWithAggregatesInput = {
     urlIframe?: Prisma.StringWithAggregatesFilter<"Report"> | string;
     activo?: Prisma.BoolWithAggregatesFilter<"Report"> | boolean;
     fechaRegistro?: Prisma.DateTimeWithAggregatesFilter<"Report"> | Date | string;
+    padreId?: Prisma.IntNullableWithAggregatesFilter<"Report"> | number | null;
 };
 export type ReportCreateInput = {
     titulo: string;
@@ -180,6 +202,8 @@ export type ReportCreateInput = {
     urlIframe: string;
     activo?: boolean;
     fechaRegistro?: Date | string;
+    padre?: Prisma.ReportCreateNestedOneWithoutChildrenInput;
+    children?: Prisma.ReportCreateNestedManyWithoutPadreInput;
     reportesRoles?: Prisma.ReportRoleCreateNestedManyWithoutReporteInput;
     reportViewLogs?: Prisma.ReportViewLogCreateNestedManyWithoutReporteInput;
 };
@@ -190,6 +214,8 @@ export type ReportUncheckedCreateInput = {
     urlIframe: string;
     activo?: boolean;
     fechaRegistro?: Date | string;
+    padreId?: number | null;
+    children?: Prisma.ReportUncheckedCreateNestedManyWithoutPadreInput;
     reportesRoles?: Prisma.ReportRoleUncheckedCreateNestedManyWithoutReporteInput;
     reportViewLogs?: Prisma.ReportViewLogUncheckedCreateNestedManyWithoutReporteInput;
 };
@@ -199,6 +225,8 @@ export type ReportUpdateInput = {
     urlIframe?: Prisma.StringFieldUpdateOperationsInput | string;
     activo?: Prisma.BoolFieldUpdateOperationsInput | boolean;
     fechaRegistro?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    padre?: Prisma.ReportUpdateOneWithoutChildrenNestedInput;
+    children?: Prisma.ReportUpdateManyWithoutPadreNestedInput;
     reportesRoles?: Prisma.ReportRoleUpdateManyWithoutReporteNestedInput;
     reportViewLogs?: Prisma.ReportViewLogUpdateManyWithoutReporteNestedInput;
 };
@@ -209,6 +237,8 @@ export type ReportUncheckedUpdateInput = {
     urlIframe?: Prisma.StringFieldUpdateOperationsInput | string;
     activo?: Prisma.BoolFieldUpdateOperationsInput | boolean;
     fechaRegistro?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    padreId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
+    children?: Prisma.ReportUncheckedUpdateManyWithoutPadreNestedInput;
     reportesRoles?: Prisma.ReportRoleUncheckedUpdateManyWithoutReporteNestedInput;
     reportViewLogs?: Prisma.ReportViewLogUncheckedUpdateManyWithoutReporteNestedInput;
 };
@@ -219,6 +249,7 @@ export type ReportCreateManyInput = {
     urlIframe: string;
     activo?: boolean;
     fechaRegistro?: Date | string;
+    padreId?: number | null;
 };
 export type ReportUpdateManyMutationInput = {
     titulo?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -234,6 +265,19 @@ export type ReportUncheckedUpdateManyInput = {
     urlIframe?: Prisma.StringFieldUpdateOperationsInput | string;
     activo?: Prisma.BoolFieldUpdateOperationsInput | boolean;
     fechaRegistro?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    padreId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
+};
+export type ReportNullableScalarRelationFilter = {
+    is?: Prisma.ReportWhereInput | null;
+    isNot?: Prisma.ReportWhereInput | null;
+};
+export type ReportListRelationFilter = {
+    every?: Prisma.ReportWhereInput;
+    some?: Prisma.ReportWhereInput;
+    none?: Prisma.ReportWhereInput;
+};
+export type ReportOrderByRelationAggregateInput = {
+    _count?: Prisma.SortOrder;
 };
 export type ReportCountOrderByAggregateInput = {
     id?: Prisma.SortOrder;
@@ -242,9 +286,11 @@ export type ReportCountOrderByAggregateInput = {
     urlIframe?: Prisma.SortOrder;
     activo?: Prisma.SortOrder;
     fechaRegistro?: Prisma.SortOrder;
+    padreId?: Prisma.SortOrder;
 };
 export type ReportAvgOrderByAggregateInput = {
     id?: Prisma.SortOrder;
+    padreId?: Prisma.SortOrder;
 };
 export type ReportMaxOrderByAggregateInput = {
     id?: Prisma.SortOrder;
@@ -253,6 +299,7 @@ export type ReportMaxOrderByAggregateInput = {
     urlIframe?: Prisma.SortOrder;
     activo?: Prisma.SortOrder;
     fechaRegistro?: Prisma.SortOrder;
+    padreId?: Prisma.SortOrder;
 };
 export type ReportMinOrderByAggregateInput = {
     id?: Prisma.SortOrder;
@@ -261,16 +308,77 @@ export type ReportMinOrderByAggregateInput = {
     urlIframe?: Prisma.SortOrder;
     activo?: Prisma.SortOrder;
     fechaRegistro?: Prisma.SortOrder;
+    padreId?: Prisma.SortOrder;
 };
 export type ReportSumOrderByAggregateInput = {
     id?: Prisma.SortOrder;
+    padreId?: Prisma.SortOrder;
 };
 export type ReportScalarRelationFilter = {
     is?: Prisma.ReportWhereInput;
     isNot?: Prisma.ReportWhereInput;
 };
+export type ReportCreateNestedOneWithoutChildrenInput = {
+    create?: Prisma.XOR<Prisma.ReportCreateWithoutChildrenInput, Prisma.ReportUncheckedCreateWithoutChildrenInput>;
+    connectOrCreate?: Prisma.ReportCreateOrConnectWithoutChildrenInput;
+    connect?: Prisma.ReportWhereUniqueInput;
+};
+export type ReportCreateNestedManyWithoutPadreInput = {
+    create?: Prisma.XOR<Prisma.ReportCreateWithoutPadreInput, Prisma.ReportUncheckedCreateWithoutPadreInput> | Prisma.ReportCreateWithoutPadreInput[] | Prisma.ReportUncheckedCreateWithoutPadreInput[];
+    connectOrCreate?: Prisma.ReportCreateOrConnectWithoutPadreInput | Prisma.ReportCreateOrConnectWithoutPadreInput[];
+    createMany?: Prisma.ReportCreateManyPadreInputEnvelope;
+    connect?: Prisma.ReportWhereUniqueInput | Prisma.ReportWhereUniqueInput[];
+};
+export type ReportUncheckedCreateNestedManyWithoutPadreInput = {
+    create?: Prisma.XOR<Prisma.ReportCreateWithoutPadreInput, Prisma.ReportUncheckedCreateWithoutPadreInput> | Prisma.ReportCreateWithoutPadreInput[] | Prisma.ReportUncheckedCreateWithoutPadreInput[];
+    connectOrCreate?: Prisma.ReportCreateOrConnectWithoutPadreInput | Prisma.ReportCreateOrConnectWithoutPadreInput[];
+    createMany?: Prisma.ReportCreateManyPadreInputEnvelope;
+    connect?: Prisma.ReportWhereUniqueInput | Prisma.ReportWhereUniqueInput[];
+};
 export type NullableStringFieldUpdateOperationsInput = {
     set?: string | null;
+};
+export type ReportUpdateOneWithoutChildrenNestedInput = {
+    create?: Prisma.XOR<Prisma.ReportCreateWithoutChildrenInput, Prisma.ReportUncheckedCreateWithoutChildrenInput>;
+    connectOrCreate?: Prisma.ReportCreateOrConnectWithoutChildrenInput;
+    upsert?: Prisma.ReportUpsertWithoutChildrenInput;
+    disconnect?: Prisma.ReportWhereInput | boolean;
+    delete?: Prisma.ReportWhereInput | boolean;
+    connect?: Prisma.ReportWhereUniqueInput;
+    update?: Prisma.XOR<Prisma.XOR<Prisma.ReportUpdateToOneWithWhereWithoutChildrenInput, Prisma.ReportUpdateWithoutChildrenInput>, Prisma.ReportUncheckedUpdateWithoutChildrenInput>;
+};
+export type ReportUpdateManyWithoutPadreNestedInput = {
+    create?: Prisma.XOR<Prisma.ReportCreateWithoutPadreInput, Prisma.ReportUncheckedCreateWithoutPadreInput> | Prisma.ReportCreateWithoutPadreInput[] | Prisma.ReportUncheckedCreateWithoutPadreInput[];
+    connectOrCreate?: Prisma.ReportCreateOrConnectWithoutPadreInput | Prisma.ReportCreateOrConnectWithoutPadreInput[];
+    upsert?: Prisma.ReportUpsertWithWhereUniqueWithoutPadreInput | Prisma.ReportUpsertWithWhereUniqueWithoutPadreInput[];
+    createMany?: Prisma.ReportCreateManyPadreInputEnvelope;
+    set?: Prisma.ReportWhereUniqueInput | Prisma.ReportWhereUniqueInput[];
+    disconnect?: Prisma.ReportWhereUniqueInput | Prisma.ReportWhereUniqueInput[];
+    delete?: Prisma.ReportWhereUniqueInput | Prisma.ReportWhereUniqueInput[];
+    connect?: Prisma.ReportWhereUniqueInput | Prisma.ReportWhereUniqueInput[];
+    update?: Prisma.ReportUpdateWithWhereUniqueWithoutPadreInput | Prisma.ReportUpdateWithWhereUniqueWithoutPadreInput[];
+    updateMany?: Prisma.ReportUpdateManyWithWhereWithoutPadreInput | Prisma.ReportUpdateManyWithWhereWithoutPadreInput[];
+    deleteMany?: Prisma.ReportScalarWhereInput | Prisma.ReportScalarWhereInput[];
+};
+export type NullableIntFieldUpdateOperationsInput = {
+    set?: number | null;
+    increment?: number;
+    decrement?: number;
+    multiply?: number;
+    divide?: number;
+};
+export type ReportUncheckedUpdateManyWithoutPadreNestedInput = {
+    create?: Prisma.XOR<Prisma.ReportCreateWithoutPadreInput, Prisma.ReportUncheckedCreateWithoutPadreInput> | Prisma.ReportCreateWithoutPadreInput[] | Prisma.ReportUncheckedCreateWithoutPadreInput[];
+    connectOrCreate?: Prisma.ReportCreateOrConnectWithoutPadreInput | Prisma.ReportCreateOrConnectWithoutPadreInput[];
+    upsert?: Prisma.ReportUpsertWithWhereUniqueWithoutPadreInput | Prisma.ReportUpsertWithWhereUniqueWithoutPadreInput[];
+    createMany?: Prisma.ReportCreateManyPadreInputEnvelope;
+    set?: Prisma.ReportWhereUniqueInput | Prisma.ReportWhereUniqueInput[];
+    disconnect?: Prisma.ReportWhereUniqueInput | Prisma.ReportWhereUniqueInput[];
+    delete?: Prisma.ReportWhereUniqueInput | Prisma.ReportWhereUniqueInput[];
+    connect?: Prisma.ReportWhereUniqueInput | Prisma.ReportWhereUniqueInput[];
+    update?: Prisma.ReportUpdateWithWhereUniqueWithoutPadreInput | Prisma.ReportUpdateWithWhereUniqueWithoutPadreInput[];
+    updateMany?: Prisma.ReportUpdateManyWithWhereWithoutPadreInput | Prisma.ReportUpdateManyWithWhereWithoutPadreInput[];
+    deleteMany?: Prisma.ReportScalarWhereInput | Prisma.ReportScalarWhereInput[];
 };
 export type ReportCreateNestedOneWithoutReportesRolesInput = {
     create?: Prisma.XOR<Prisma.ReportCreateWithoutReportesRolesInput, Prisma.ReportUncheckedCreateWithoutReportesRolesInput>;
@@ -296,12 +404,123 @@ export type ReportUpdateOneRequiredWithoutReportViewLogsNestedInput = {
     connect?: Prisma.ReportWhereUniqueInput;
     update?: Prisma.XOR<Prisma.XOR<Prisma.ReportUpdateToOneWithWhereWithoutReportViewLogsInput, Prisma.ReportUpdateWithoutReportViewLogsInput>, Prisma.ReportUncheckedUpdateWithoutReportViewLogsInput>;
 };
+export type ReportCreateWithoutChildrenInput = {
+    titulo: string;
+    descripcion?: string | null;
+    urlIframe: string;
+    activo?: boolean;
+    fechaRegistro?: Date | string;
+    padre?: Prisma.ReportCreateNestedOneWithoutChildrenInput;
+    reportesRoles?: Prisma.ReportRoleCreateNestedManyWithoutReporteInput;
+    reportViewLogs?: Prisma.ReportViewLogCreateNestedManyWithoutReporteInput;
+};
+export type ReportUncheckedCreateWithoutChildrenInput = {
+    id?: number;
+    titulo: string;
+    descripcion?: string | null;
+    urlIframe: string;
+    activo?: boolean;
+    fechaRegistro?: Date | string;
+    padreId?: number | null;
+    reportesRoles?: Prisma.ReportRoleUncheckedCreateNestedManyWithoutReporteInput;
+    reportViewLogs?: Prisma.ReportViewLogUncheckedCreateNestedManyWithoutReporteInput;
+};
+export type ReportCreateOrConnectWithoutChildrenInput = {
+    where: Prisma.ReportWhereUniqueInput;
+    create: Prisma.XOR<Prisma.ReportCreateWithoutChildrenInput, Prisma.ReportUncheckedCreateWithoutChildrenInput>;
+};
+export type ReportCreateWithoutPadreInput = {
+    titulo: string;
+    descripcion?: string | null;
+    urlIframe: string;
+    activo?: boolean;
+    fechaRegistro?: Date | string;
+    children?: Prisma.ReportCreateNestedManyWithoutPadreInput;
+    reportesRoles?: Prisma.ReportRoleCreateNestedManyWithoutReporteInput;
+    reportViewLogs?: Prisma.ReportViewLogCreateNestedManyWithoutReporteInput;
+};
+export type ReportUncheckedCreateWithoutPadreInput = {
+    id?: number;
+    titulo: string;
+    descripcion?: string | null;
+    urlIframe: string;
+    activo?: boolean;
+    fechaRegistro?: Date | string;
+    children?: Prisma.ReportUncheckedCreateNestedManyWithoutPadreInput;
+    reportesRoles?: Prisma.ReportRoleUncheckedCreateNestedManyWithoutReporteInput;
+    reportViewLogs?: Prisma.ReportViewLogUncheckedCreateNestedManyWithoutReporteInput;
+};
+export type ReportCreateOrConnectWithoutPadreInput = {
+    where: Prisma.ReportWhereUniqueInput;
+    create: Prisma.XOR<Prisma.ReportCreateWithoutPadreInput, Prisma.ReportUncheckedCreateWithoutPadreInput>;
+};
+export type ReportCreateManyPadreInputEnvelope = {
+    data: Prisma.ReportCreateManyPadreInput | Prisma.ReportCreateManyPadreInput[];
+    skipDuplicates?: boolean;
+};
+export type ReportUpsertWithoutChildrenInput = {
+    update: Prisma.XOR<Prisma.ReportUpdateWithoutChildrenInput, Prisma.ReportUncheckedUpdateWithoutChildrenInput>;
+    create: Prisma.XOR<Prisma.ReportCreateWithoutChildrenInput, Prisma.ReportUncheckedCreateWithoutChildrenInput>;
+    where?: Prisma.ReportWhereInput;
+};
+export type ReportUpdateToOneWithWhereWithoutChildrenInput = {
+    where?: Prisma.ReportWhereInput;
+    data: Prisma.XOR<Prisma.ReportUpdateWithoutChildrenInput, Prisma.ReportUncheckedUpdateWithoutChildrenInput>;
+};
+export type ReportUpdateWithoutChildrenInput = {
+    titulo?: Prisma.StringFieldUpdateOperationsInput | string;
+    descripcion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    urlIframe?: Prisma.StringFieldUpdateOperationsInput | string;
+    activo?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    fechaRegistro?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    padre?: Prisma.ReportUpdateOneWithoutChildrenNestedInput;
+    reportesRoles?: Prisma.ReportRoleUpdateManyWithoutReporteNestedInput;
+    reportViewLogs?: Prisma.ReportViewLogUpdateManyWithoutReporteNestedInput;
+};
+export type ReportUncheckedUpdateWithoutChildrenInput = {
+    id?: Prisma.IntFieldUpdateOperationsInput | number;
+    titulo?: Prisma.StringFieldUpdateOperationsInput | string;
+    descripcion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    urlIframe?: Prisma.StringFieldUpdateOperationsInput | string;
+    activo?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    fechaRegistro?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    padreId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
+    reportesRoles?: Prisma.ReportRoleUncheckedUpdateManyWithoutReporteNestedInput;
+    reportViewLogs?: Prisma.ReportViewLogUncheckedUpdateManyWithoutReporteNestedInput;
+};
+export type ReportUpsertWithWhereUniqueWithoutPadreInput = {
+    where: Prisma.ReportWhereUniqueInput;
+    update: Prisma.XOR<Prisma.ReportUpdateWithoutPadreInput, Prisma.ReportUncheckedUpdateWithoutPadreInput>;
+    create: Prisma.XOR<Prisma.ReportCreateWithoutPadreInput, Prisma.ReportUncheckedCreateWithoutPadreInput>;
+};
+export type ReportUpdateWithWhereUniqueWithoutPadreInput = {
+    where: Prisma.ReportWhereUniqueInput;
+    data: Prisma.XOR<Prisma.ReportUpdateWithoutPadreInput, Prisma.ReportUncheckedUpdateWithoutPadreInput>;
+};
+export type ReportUpdateManyWithWhereWithoutPadreInput = {
+    where: Prisma.ReportScalarWhereInput;
+    data: Prisma.XOR<Prisma.ReportUpdateManyMutationInput, Prisma.ReportUncheckedUpdateManyWithoutPadreInput>;
+};
+export type ReportScalarWhereInput = {
+    AND?: Prisma.ReportScalarWhereInput | Prisma.ReportScalarWhereInput[];
+    OR?: Prisma.ReportScalarWhereInput[];
+    NOT?: Prisma.ReportScalarWhereInput | Prisma.ReportScalarWhereInput[];
+    id?: Prisma.IntFilter<"Report"> | number;
+    titulo?: Prisma.StringFilter<"Report"> | string;
+    descripcion?: Prisma.StringNullableFilter<"Report"> | string | null;
+    urlIframe?: Prisma.StringFilter<"Report"> | string;
+    activo?: Prisma.BoolFilter<"Report"> | boolean;
+    fechaRegistro?: Prisma.DateTimeFilter<"Report"> | Date | string;
+    padreId?: Prisma.IntNullableFilter<"Report"> | number | null;
+};
 export type ReportCreateWithoutReportesRolesInput = {
     titulo: string;
     descripcion?: string | null;
     urlIframe: string;
     activo?: boolean;
     fechaRegistro?: Date | string;
+    padre?: Prisma.ReportCreateNestedOneWithoutChildrenInput;
+    children?: Prisma.ReportCreateNestedManyWithoutPadreInput;
     reportViewLogs?: Prisma.ReportViewLogCreateNestedManyWithoutReporteInput;
 };
 export type ReportUncheckedCreateWithoutReportesRolesInput = {
@@ -311,6 +530,8 @@ export type ReportUncheckedCreateWithoutReportesRolesInput = {
     urlIframe: string;
     activo?: boolean;
     fechaRegistro?: Date | string;
+    padreId?: number | null;
+    children?: Prisma.ReportUncheckedCreateNestedManyWithoutPadreInput;
     reportViewLogs?: Prisma.ReportViewLogUncheckedCreateNestedManyWithoutReporteInput;
 };
 export type ReportCreateOrConnectWithoutReportesRolesInput = {
@@ -332,6 +553,8 @@ export type ReportUpdateWithoutReportesRolesInput = {
     urlIframe?: Prisma.StringFieldUpdateOperationsInput | string;
     activo?: Prisma.BoolFieldUpdateOperationsInput | boolean;
     fechaRegistro?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    padre?: Prisma.ReportUpdateOneWithoutChildrenNestedInput;
+    children?: Prisma.ReportUpdateManyWithoutPadreNestedInput;
     reportViewLogs?: Prisma.ReportViewLogUpdateManyWithoutReporteNestedInput;
 };
 export type ReportUncheckedUpdateWithoutReportesRolesInput = {
@@ -341,6 +564,8 @@ export type ReportUncheckedUpdateWithoutReportesRolesInput = {
     urlIframe?: Prisma.StringFieldUpdateOperationsInput | string;
     activo?: Prisma.BoolFieldUpdateOperationsInput | boolean;
     fechaRegistro?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    padreId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
+    children?: Prisma.ReportUncheckedUpdateManyWithoutPadreNestedInput;
     reportViewLogs?: Prisma.ReportViewLogUncheckedUpdateManyWithoutReporteNestedInput;
 };
 export type ReportCreateWithoutReportViewLogsInput = {
@@ -349,6 +574,8 @@ export type ReportCreateWithoutReportViewLogsInput = {
     urlIframe: string;
     activo?: boolean;
     fechaRegistro?: Date | string;
+    padre?: Prisma.ReportCreateNestedOneWithoutChildrenInput;
+    children?: Prisma.ReportCreateNestedManyWithoutPadreInput;
     reportesRoles?: Prisma.ReportRoleCreateNestedManyWithoutReporteInput;
 };
 export type ReportUncheckedCreateWithoutReportViewLogsInput = {
@@ -358,6 +585,8 @@ export type ReportUncheckedCreateWithoutReportViewLogsInput = {
     urlIframe: string;
     activo?: boolean;
     fechaRegistro?: Date | string;
+    padreId?: number | null;
+    children?: Prisma.ReportUncheckedCreateNestedManyWithoutPadreInput;
     reportesRoles?: Prisma.ReportRoleUncheckedCreateNestedManyWithoutReporteInput;
 };
 export type ReportCreateOrConnectWithoutReportViewLogsInput = {
@@ -379,6 +608,8 @@ export type ReportUpdateWithoutReportViewLogsInput = {
     urlIframe?: Prisma.StringFieldUpdateOperationsInput | string;
     activo?: Prisma.BoolFieldUpdateOperationsInput | boolean;
     fechaRegistro?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    padre?: Prisma.ReportUpdateOneWithoutChildrenNestedInput;
+    children?: Prisma.ReportUpdateManyWithoutPadreNestedInput;
     reportesRoles?: Prisma.ReportRoleUpdateManyWithoutReporteNestedInput;
 };
 export type ReportUncheckedUpdateWithoutReportViewLogsInput = {
@@ -388,18 +619,62 @@ export type ReportUncheckedUpdateWithoutReportViewLogsInput = {
     urlIframe?: Prisma.StringFieldUpdateOperationsInput | string;
     activo?: Prisma.BoolFieldUpdateOperationsInput | boolean;
     fechaRegistro?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    padreId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
+    children?: Prisma.ReportUncheckedUpdateManyWithoutPadreNestedInput;
     reportesRoles?: Prisma.ReportRoleUncheckedUpdateManyWithoutReporteNestedInput;
 };
+export type ReportCreateManyPadreInput = {
+    id?: number;
+    titulo: string;
+    descripcion?: string | null;
+    urlIframe: string;
+    activo?: boolean;
+    fechaRegistro?: Date | string;
+};
+export type ReportUpdateWithoutPadreInput = {
+    titulo?: Prisma.StringFieldUpdateOperationsInput | string;
+    descripcion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    urlIframe?: Prisma.StringFieldUpdateOperationsInput | string;
+    activo?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    fechaRegistro?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    children?: Prisma.ReportUpdateManyWithoutPadreNestedInput;
+    reportesRoles?: Prisma.ReportRoleUpdateManyWithoutReporteNestedInput;
+    reportViewLogs?: Prisma.ReportViewLogUpdateManyWithoutReporteNestedInput;
+};
+export type ReportUncheckedUpdateWithoutPadreInput = {
+    id?: Prisma.IntFieldUpdateOperationsInput | number;
+    titulo?: Prisma.StringFieldUpdateOperationsInput | string;
+    descripcion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    urlIframe?: Prisma.StringFieldUpdateOperationsInput | string;
+    activo?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    fechaRegistro?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    children?: Prisma.ReportUncheckedUpdateManyWithoutPadreNestedInput;
+    reportesRoles?: Prisma.ReportRoleUncheckedUpdateManyWithoutReporteNestedInput;
+    reportViewLogs?: Prisma.ReportViewLogUncheckedUpdateManyWithoutReporteNestedInput;
+};
+export type ReportUncheckedUpdateManyWithoutPadreInput = {
+    id?: Prisma.IntFieldUpdateOperationsInput | number;
+    titulo?: Prisma.StringFieldUpdateOperationsInput | string;
+    descripcion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    urlIframe?: Prisma.StringFieldUpdateOperationsInput | string;
+    activo?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    fechaRegistro?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+};
 export type ReportCountOutputType = {
+    children: number;
     reportesRoles: number;
     reportViewLogs: number;
 };
 export type ReportCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    children?: boolean | ReportCountOutputTypeCountChildrenArgs;
     reportesRoles?: boolean | ReportCountOutputTypeCountReportesRolesArgs;
     reportViewLogs?: boolean | ReportCountOutputTypeCountReportViewLogsArgs;
 };
 export type ReportCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     select?: Prisma.ReportCountOutputTypeSelect<ExtArgs> | null;
+};
+export type ReportCountOutputTypeCountChildrenArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    where?: Prisma.ReportWhereInput;
 };
 export type ReportCountOutputTypeCountReportesRolesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     where?: Prisma.ReportRoleWhereInput;
@@ -414,6 +689,9 @@ export type ReportSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     urlIframe?: boolean;
     activo?: boolean;
     fechaRegistro?: boolean;
+    padreId?: boolean;
+    padre?: boolean | Prisma.Report$padreArgs<ExtArgs>;
+    children?: boolean | Prisma.Report$childrenArgs<ExtArgs>;
     reportesRoles?: boolean | Prisma.Report$reportesRolesArgs<ExtArgs>;
     reportViewLogs?: boolean | Prisma.Report$reportViewLogsArgs<ExtArgs>;
     _count?: boolean | Prisma.ReportCountOutputTypeDefaultArgs<ExtArgs>;
@@ -425,6 +703,8 @@ export type ReportSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
     urlIframe?: boolean;
     activo?: boolean;
     fechaRegistro?: boolean;
+    padreId?: boolean;
+    padre?: boolean | Prisma.Report$padreArgs<ExtArgs>;
 }, ExtArgs["result"]["report"]>;
 export type ReportSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
     id?: boolean;
@@ -433,6 +713,8 @@ export type ReportSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
     urlIframe?: boolean;
     activo?: boolean;
     fechaRegistro?: boolean;
+    padreId?: boolean;
+    padre?: boolean | Prisma.Report$padreArgs<ExtArgs>;
 }, ExtArgs["result"]["report"]>;
 export type ReportSelectScalar = {
     id?: boolean;
@@ -441,18 +723,27 @@ export type ReportSelectScalar = {
     urlIframe?: boolean;
     activo?: boolean;
     fechaRegistro?: boolean;
+    padreId?: boolean;
 };
-export type ReportOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "titulo" | "descripcion" | "urlIframe" | "activo" | "fechaRegistro", ExtArgs["result"]["report"]>;
+export type ReportOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "titulo" | "descripcion" | "urlIframe" | "activo" | "fechaRegistro" | "padreId", ExtArgs["result"]["report"]>;
 export type ReportInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    padre?: boolean | Prisma.Report$padreArgs<ExtArgs>;
+    children?: boolean | Prisma.Report$childrenArgs<ExtArgs>;
     reportesRoles?: boolean | Prisma.Report$reportesRolesArgs<ExtArgs>;
     reportViewLogs?: boolean | Prisma.Report$reportViewLogsArgs<ExtArgs>;
     _count?: boolean | Prisma.ReportCountOutputTypeDefaultArgs<ExtArgs>;
 };
-export type ReportIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {};
-export type ReportIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {};
+export type ReportIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    padre?: boolean | Prisma.Report$padreArgs<ExtArgs>;
+};
+export type ReportIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    padre?: boolean | Prisma.Report$padreArgs<ExtArgs>;
+};
 export type $ReportPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     name: "Report";
     objects: {
+        padre: Prisma.$ReportPayload<ExtArgs> | null;
+        children: Prisma.$ReportPayload<ExtArgs>[];
         reportesRoles: Prisma.$ReportRolePayload<ExtArgs>[];
         reportViewLogs: Prisma.$ReportViewLogPayload<ExtArgs>[];
     };
@@ -463,6 +754,7 @@ export type $ReportPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
         urlIframe: string;
         activo: boolean;
         fechaRegistro: Date;
+        padreId: number | null;
     }, ExtArgs["result"]["report"]>;
     composites: {};
 };
@@ -515,6 +807,8 @@ export interface ReportDelegate<ExtArgs extends runtime.Types.Extensions.Interna
 }
 export interface Prisma__ReportClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise";
+    padre<T extends Prisma.Report$padreArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Report$padreArgs<ExtArgs>>): Prisma.Prisma__ReportClient<runtime.Types.Result.GetResult<Prisma.$ReportPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
+    children<T extends Prisma.Report$childrenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Report$childrenArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReportPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
     reportesRoles<T extends Prisma.Report$reportesRolesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Report$reportesRolesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReportRolePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
     reportViewLogs<T extends Prisma.Report$reportViewLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Report$reportViewLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReportViewLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
     then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): runtime.Types.Utils.JsPromise<TResult1 | TResult2>;
@@ -528,6 +822,7 @@ export interface ReportFieldRefs {
     readonly urlIframe: Prisma.FieldRef<"Report", 'String'>;
     readonly activo: Prisma.FieldRef<"Report", 'Boolean'>;
     readonly fechaRegistro: Prisma.FieldRef<"Report", 'DateTime'>;
+    readonly padreId: Prisma.FieldRef<"Report", 'Int'>;
 }
 export type ReportFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     select?: Prisma.ReportSelect<ExtArgs> | null;
@@ -589,6 +884,7 @@ export type ReportCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensio
     omit?: Prisma.ReportOmit<ExtArgs> | null;
     data: Prisma.ReportCreateManyInput | Prisma.ReportCreateManyInput[];
     skipDuplicates?: boolean;
+    include?: Prisma.ReportIncludeCreateManyAndReturn<ExtArgs> | null;
 };
 export type ReportUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     select?: Prisma.ReportSelect<ExtArgs> | null;
@@ -608,6 +904,7 @@ export type ReportUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensio
     data: Prisma.XOR<Prisma.ReportUpdateManyMutationInput, Prisma.ReportUncheckedUpdateManyInput>;
     where?: Prisma.ReportWhereInput;
     limit?: number;
+    include?: Prisma.ReportIncludeUpdateManyAndReturn<ExtArgs> | null;
 };
 export type ReportUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     select?: Prisma.ReportSelect<ExtArgs> | null;
@@ -626,6 +923,23 @@ export type ReportDeleteArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
 export type ReportDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     where?: Prisma.ReportWhereInput;
     limit?: number;
+};
+export type Report$padreArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    select?: Prisma.ReportSelect<ExtArgs> | null;
+    omit?: Prisma.ReportOmit<ExtArgs> | null;
+    include?: Prisma.ReportInclude<ExtArgs> | null;
+    where?: Prisma.ReportWhereInput;
+};
+export type Report$childrenArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    select?: Prisma.ReportSelect<ExtArgs> | null;
+    omit?: Prisma.ReportOmit<ExtArgs> | null;
+    include?: Prisma.ReportInclude<ExtArgs> | null;
+    where?: Prisma.ReportWhereInput;
+    orderBy?: Prisma.ReportOrderByWithRelationInput | Prisma.ReportOrderByWithRelationInput[];
+    cursor?: Prisma.ReportWhereUniqueInput;
+    take?: number;
+    skip?: number;
+    distinct?: Prisma.ReportScalarFieldEnum | Prisma.ReportScalarFieldEnum[];
 };
 export type Report$reportesRolesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     select?: Prisma.ReportRoleSelect<ExtArgs> | null;

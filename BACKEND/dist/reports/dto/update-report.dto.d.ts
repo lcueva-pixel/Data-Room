@@ -4,4 +4,5 @@ export declare class UpdateReportDto {
     descripcion?: string;
     rolesIds?: number[];
     activo?: boolean;
+    padreId?: number | null;
 }

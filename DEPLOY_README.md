@@ -81,6 +81,40 @@ pm2 save
 
 ---
 
+## 🔐 HTTPS/SSL (Opcional - Después del setup básico)
+
+Una vez que el sitio funciona en HTTP, configura HTTPS:
+
+```bash
+# 1. Configurar DNS (dataroom.construex.com → IP del EC2)
+# Esperar 5-10 minutos para propagación
+
+# 2. Instalar Certbot
+sudo dnf install -y python3 augeas-libs
+sudo python3 -m venv /opt/certbot/
+sudo /opt/certbot/bin/pip install --upgrade pip
+sudo /opt/certbot/bin/pip install certbot certbot-nginx
+sudo ln -s /opt/certbot/bin/certbot /usr/bin/certbot
+
+# 3. Generar certificado
+sudo certbot certonly --nginx -d dataroom.construex.com
+
+# 4. Actualizar NGINX con configuración SSL
+cd ~/Data-Room
+git pull origin main
+sudo cp nginx/dataroom.conf /etc/nginx/conf.d/dataroom.conf
+sudo nginx -t && sudo systemctl reload nginx
+
+# 5. Actualizar backend .env con HTTPS
+nano ~/Data-Room/BACKEND/.env
+# Cambiar: CORS_ORIGIN=https://dataroom.construex.com
+pm2 restart dataroom-backend
+```
+
+**Ver guía completa:** [DEPLOY_HTTPS.md](DEPLOY_HTTPS.md)
+
+---
+
 ## 🏗️ Arquitectura
 
 ```

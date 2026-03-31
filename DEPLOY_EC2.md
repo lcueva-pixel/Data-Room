@@ -21,11 +21,13 @@
 
 Abrir estos puertos en el Security Group de la instancia:
 
-| Tipo | Protocolo | Puerto | Origen |
-|------|-----------|--------|--------|
-| SSH | TCP | 22 | Tu IP (o 0.0.0.0/0 temporal) |
-| HTTP | TCP | 80 | 0.0.0.0/0 |
-| HTTPS | TCP | 443 | 0.0.0.0/0 |
+| Tipo | Protocolo | Puerto | Origen | Notas |
+|------|-----------|--------|--------|-------|
+| SSH | TCP | 22 | Tu IP (o 0.0.0.0/0 temporal) | Acceso remoto |
+| HTTP | TCP | 80 | 0.0.0.0/0 | Tráfico web / validación SSL |
+| HTTPS | TCP | 443 | 0.0.0.0/0 | Tráfico web seguro (opcional) |
+
+> **Nota:** El puerto 443 es necesario solo si vas a configurar HTTPS (ver [DEPLOY_HTTPS.md](DEPLOY_HTTPS.md))
 
 ---
 
@@ -390,3 +392,5 @@ sudo firewall-cmd --list-all
     │   (PostgreSQL)   │      │
     └─────────────────┘       │
 ```
+
+> **Para HTTPS:** Después de completar esta guía, sigue [DEPLOY_HTTPS.md](DEPLOY_HTTPS.md) para configurar SSL con Let's Encrypt.
