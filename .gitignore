@@ -1,11 +1,42 @@
 # Root .gitignore - Data Room
 
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build outputs
+BACKEND/dist/
+frontend/.next/
+frontend/out/
+frontend/build/
+**/dist/
+**/build/
+
+# TypeScript
+*.tsbuildinfo
+**/*.tsbuildinfo
+
+# Environment variables
+.env
+.env.local
+.env.production.local
+.env.development.local
+**/.env
+**/.env.local
+
 # PM2 logs
 logs/
 *.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
 
-# PM2 ecosystem generado dinámicamente (si aplica)
+# PM2
 .pm2/
+pids/
+*.pid
+*.seed
+*.pid.lock
 
 # Scripts locales de deploy temporales
 deploy-local.sh
@@ -13,16 +44,36 @@ deploy-local.sh
 # Backups
 *.backup
 *.bak
+*.old
 
 # Editor configs locales
-.vscode/settings.json
+.vscode/
+!.vscode/extensions.json
 .idea/
+*.swp
+*.swo
+*~
 
 # OS
 .DS_Store
+.DS_Store?
+._*
 Thumbs.db
+desktop.ini
 
-# Env files (por si acaso)
-.env
-.env.local
-.env.production.local
+# Testing
+coverage/
+.nyc_output/
+
+# Cache
+.cache/
+.npm/
+.eslintcache
+
+# Uploads
+uploads/
+**/uploads/
+
+# Prisma generated
+**/generated/
+BACKEND/src/generated/
