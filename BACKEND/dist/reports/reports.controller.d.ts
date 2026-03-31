@@ -6,7 +6,25 @@ export declare class ReportsController {
     private readonly reportsService;
     constructor(reportsService: ReportsService);
     findAll(req: any): Promise<({
+        reportesRoles: ({
+            rol: {
+                id: number;
+                rolDescripcion: string;
+            };
+        } & {
+            rolId: number;
+            reporteId: number;
+        })[];
         children: ({
+            reportesRoles: ({
+                rol: {
+                    id: number;
+                    rolDescripcion: string;
+                };
+            } & {
+                rolId: number;
+                reporteId: number;
+            })[];
             children: ({
                 reportesRoles: ({
                     rol: {
@@ -19,76 +37,61 @@ export declare class ReportsController {
                 })[];
             } & {
                 id: number;
+                activo: boolean;
                 titulo: string;
                 descripcion: string | null;
                 urlIframe: string;
-                activo: boolean;
                 fechaRegistro: Date;
                 padreId: number | null;
             })[];
-            reportesRoles: ({
-                rol: {
-                    id: number;
-                    rolDescripcion: string;
-                };
-            } & {
-                rolId: number;
-                reporteId: number;
-            })[];
         } & {
             id: number;
+            activo: boolean;
             titulo: string;
             descripcion: string | null;
             urlIframe: string;
-            activo: boolean;
             fechaRegistro: Date;
             padreId: number | null;
         })[];
-        reportesRoles: ({
-            rol: {
-                id: number;
-                rolDescripcion: string;
-            };
-        } & {
-            rolId: number;
-            reporteId: number;
-        })[];
     } & {
         id: number;
+        activo: boolean;
         titulo: string;
         descripcion: string | null;
         urlIframe: string;
-        activo: boolean;
         fechaRegistro: Date;
         padreId: number | null;
     })[]>;
     findAllAdmin(query: ListReportsQueryDto): Promise<import("../common/dto/paginated-response.dto").PaginatedResponse<{
+        _count: {
+            children: number;
+        };
+        reportesRoles: ({
+            rol: {
+                id: number;
+                rolDescripcion: string;
+            };
+        } & {
+            rolId: number;
+            reporteId: number;
+        })[];
         padre: {
             id: number;
             titulo: string;
         } | null;
-        reportesRoles: ({
-            rol: {
-                id: number;
-                rolDescripcion: string;
-            };
-        } & {
-            rolId: number;
-            reporteId: number;
-        })[];
-        _count: {
-            children: number;
-        };
     } & {
         id: number;
+        activo: boolean;
         titulo: string;
         descripcion: string | null;
         urlIframe: string;
-        activo: boolean;
         fechaRegistro: Date;
         padreId: number | null;
     }>>;
     findChildren(id: number): Promise<({
+        _count: {
+            children: number;
+        };
         reportesRoles: ({
             rol: {
                 id: number;
@@ -98,15 +101,12 @@ export declare class ReportsController {
             rolId: number;
             reporteId: number;
         })[];
-        _count: {
-            children: number;
-        };
     } & {
         id: number;
+        activo: boolean;
         titulo: string;
         descripcion: string | null;
         urlIframe: string;
-        activo: boolean;
         fechaRegistro: Date;
         padreId: number | null;
     })[]>;
@@ -117,10 +117,9 @@ export declare class ReportsController {
         message: string;
     }>;
     toggleActivo(id: number): Promise<{
-        padre: {
-            id: number;
-            titulo: string;
-        } | null;
+        _count: {
+            children: number;
+        };
         reportesRoles: ({
             rol: {
                 id: number;
@@ -130,15 +129,16 @@ export declare class ReportsController {
             rolId: number;
             reporteId: number;
         })[];
-        _count: {
-            children: number;
-        };
+        padre: {
+            id: number;
+            titulo: string;
+        } | null;
     } & {
         id: number;
+        activo: boolean;
         titulo: string;
         descripcion: string | null;
         urlIframe: string;
-        activo: boolean;
         fechaRegistro: Date;
         padreId: number | null;
     }>;

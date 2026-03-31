@@ -76,7 +76,6 @@ export declare const AuditAccessScalarFieldEnum: {
     readonly id: "id";
     readonly usuarioId: "usuarioId";
     readonly fechaHora: "fechaHora";
-    readonly ipAddress: "ipAddress";
     readonly userAgent: "userAgent";
 };
 export type AuditAccessScalarFieldEnum = (typeof AuditAccessScalarFieldEnum)[keyof typeof AuditAccessScalarFieldEnum];

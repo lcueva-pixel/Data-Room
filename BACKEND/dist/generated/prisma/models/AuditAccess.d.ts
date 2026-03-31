@@ -20,21 +20,18 @@ export type AuditAccessMinAggregateOutputType = {
     id: number | null;
     usuarioId: number | null;
     fechaHora: Date | null;
-    ipAddress: string | null;
     userAgent: string | null;
 };
 export type AuditAccessMaxAggregateOutputType = {
     id: number | null;
     usuarioId: number | null;
     fechaHora: Date | null;
-    ipAddress: string | null;
     userAgent: string | null;
 };
 export type AuditAccessCountAggregateOutputType = {
     id: number;
     usuarioId: number;
     fechaHora: number;
-    ipAddress: number;
     userAgent: number;
     _all: number;
 };
@@ -50,21 +47,18 @@ export type AuditAccessMinAggregateInputType = {
     id?: true;
     usuarioId?: true;
     fechaHora?: true;
-    ipAddress?: true;
     userAgent?: true;
 };
 export type AuditAccessMaxAggregateInputType = {
     id?: true;
     usuarioId?: true;
     fechaHora?: true;
-    ipAddress?: true;
     userAgent?: true;
 };
 export type AuditAccessCountAggregateInputType = {
     id?: true;
     usuarioId?: true;
     fechaHora?: true;
-    ipAddress?: true;
     userAgent?: true;
     _all?: true;
 };
@@ -100,7 +94,6 @@ export type AuditAccessGroupByOutputType = {
     id: number;
     usuarioId: number;
     fechaHora: Date;
-    ipAddress: string | null;
     userAgent: string | null;
     _count: AuditAccessCountAggregateOutputType | null;
     _avg: AuditAccessAvgAggregateOutputType | null;
@@ -118,7 +111,6 @@ export type AuditAccessWhereInput = {
     id?: Prisma.IntFilter<"AuditAccess"> | number;
     usuarioId?: Prisma.IntFilter<"AuditAccess"> | number;
     fechaHora?: Prisma.DateTimeFilter<"AuditAccess"> | Date | string;
-    ipAddress?: Prisma.StringNullableFilter<"AuditAccess"> | string | null;
     userAgent?: Prisma.StringNullableFilter<"AuditAccess"> | string | null;
     usuario?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>;
 };
@@ -126,7 +118,6 @@ export type AuditAccessOrderByWithRelationInput = {
     id?: Prisma.SortOrder;
     usuarioId?: Prisma.SortOrder;
     fechaHora?: Prisma.SortOrder;
-    ipAddress?: Prisma.SortOrderInput | Prisma.SortOrder;
     userAgent?: Prisma.SortOrderInput | Prisma.SortOrder;
     usuario?: Prisma.UserOrderByWithRelationInput;
 };
@@ -137,7 +128,6 @@ export type AuditAccessWhereUniqueInput = Prisma.AtLeast<{
     NOT?: Prisma.AuditAccessWhereInput | Prisma.AuditAccessWhereInput[];
     usuarioId?: Prisma.IntFilter<"AuditAccess"> | number;
     fechaHora?: Prisma.DateTimeFilter<"AuditAccess"> | Date | string;
-    ipAddress?: Prisma.StringNullableFilter<"AuditAccess"> | string | null;
     userAgent?: Prisma.StringNullableFilter<"AuditAccess"> | string | null;
     usuario?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>;
 }, "id">;
@@ -145,7 +135,6 @@ export type AuditAccessOrderByWithAggregationInput = {
     id?: Prisma.SortOrder;
     usuarioId?: Prisma.SortOrder;
     fechaHora?: Prisma.SortOrder;
-    ipAddress?: Prisma.SortOrderInput | Prisma.SortOrder;
     userAgent?: Prisma.SortOrderInput | Prisma.SortOrder;
     _count?: Prisma.AuditAccessCountOrderByAggregateInput;
     _avg?: Prisma.AuditAccessAvgOrderByAggregateInput;
@@ -160,12 +149,10 @@ export type AuditAccessScalarWhereWithAggregatesInput = {
     id?: Prisma.IntWithAggregatesFilter<"AuditAccess"> | number;
     usuarioId?: Prisma.IntWithAggregatesFilter<"AuditAccess"> | number;
     fechaHora?: Prisma.DateTimeWithAggregatesFilter<"AuditAccess"> | Date | string;
-    ipAddress?: Prisma.StringNullableWithAggregatesFilter<"AuditAccess"> | string | null;
     userAgent?: Prisma.StringNullableWithAggregatesFilter<"AuditAccess"> | string | null;
 };
 export type AuditAccessCreateInput = {
     fechaHora?: Date | string;
-    ipAddress?: string | null;
     userAgent?: string | null;
     usuario: Prisma.UserCreateNestedOneWithoutAuditAccessesInput;
 };
@@ -173,12 +160,10 @@ export type AuditAccessUncheckedCreateInput = {
     id?: number;
     usuarioId: number;
     fechaHora?: Date | string;
-    ipAddress?: string | null;
     userAgent?: string | null;
 };
 export type AuditAccessUpdateInput = {
     fechaHora?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     userAgent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     usuario?: Prisma.UserUpdateOneRequiredWithoutAuditAccessesNestedInput;
 };
@@ -186,26 +171,22 @@ export type AuditAccessUncheckedUpdateInput = {
     id?: Prisma.IntFieldUpdateOperationsInput | number;
     usuarioId?: Prisma.IntFieldUpdateOperationsInput | number;
     fechaHora?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     userAgent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
 };
 export type AuditAccessCreateManyInput = {
     id?: number;
     usuarioId: number;
     fechaHora?: Date | string;
-    ipAddress?: string | null;
     userAgent?: string | null;
 };
 export type AuditAccessUpdateManyMutationInput = {
     fechaHora?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     userAgent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
 };
 export type AuditAccessUncheckedUpdateManyInput = {
     id?: Prisma.IntFieldUpdateOperationsInput | number;
     usuarioId?: Prisma.IntFieldUpdateOperationsInput | number;
     fechaHora?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     userAgent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
 };
 export type AuditAccessListRelationFilter = {
@@ -220,7 +201,6 @@ export type AuditAccessCountOrderByAggregateInput = {
     id?: Prisma.SortOrder;
     usuarioId?: Prisma.SortOrder;
     fechaHora?: Prisma.SortOrder;
-    ipAddress?: Prisma.SortOrder;
     userAgent?: Prisma.SortOrder;
 };
 export type AuditAccessAvgOrderByAggregateInput = {
@@ -231,14 +211,12 @@ export type AuditAccessMaxOrderByAggregateInput = {
     id?: Prisma.SortOrder;
     usuarioId?: Prisma.SortOrder;
     fechaHora?: Prisma.SortOrder;
-    ipAddress?: Prisma.SortOrder;
     userAgent?: Prisma.SortOrder;
 };
 export type AuditAccessMinOrderByAggregateInput = {
     id?: Prisma.SortOrder;
     usuarioId?: Prisma.SortOrder;
     fechaHora?: Prisma.SortOrder;
-    ipAddress?: Prisma.SortOrder;
     userAgent?: Prisma.SortOrder;
 };
 export type AuditAccessSumOrderByAggregateInput = {
@@ -285,13 +263,11 @@ export type AuditAccessUncheckedUpdateManyWithoutUsuarioNestedInput = {
 };
 export type AuditAccessCreateWithoutUsuarioInput = {
     fechaHora?: Date | string;
-    ipAddress?: string | null;
     userAgent?: string | null;
 };
 export type AuditAccessUncheckedCreateWithoutUsuarioInput = {
     id?: number;
     fechaHora?: Date | string;
-    ipAddress?: string | null;
     userAgent?: string | null;
 };
 export type AuditAccessCreateOrConnectWithoutUsuarioInput = {
@@ -322,37 +298,31 @@ export type AuditAccessScalarWhereInput = {
     id?: Prisma.IntFilter<"AuditAccess"> | number;
     usuarioId?: Prisma.IntFilter<"AuditAccess"> | number;
     fechaHora?: Prisma.DateTimeFilter<"AuditAccess"> | Date | string;
-    ipAddress?: Prisma.StringNullableFilter<"AuditAccess"> | string | null;
     userAgent?: Prisma.StringNullableFilter<"AuditAccess"> | string | null;
 };
 export type AuditAccessCreateManyUsuarioInput = {
     id?: number;
     fechaHora?: Date | string;
-    ipAddress?: string | null;
     userAgent?: string | null;
 };
 export type AuditAccessUpdateWithoutUsuarioInput = {
     fechaHora?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     userAgent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
 };
 export type AuditAccessUncheckedUpdateWithoutUsuarioInput = {
     id?: Prisma.IntFieldUpdateOperationsInput | number;
     fechaHora?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     userAgent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
 };
 export type AuditAccessUncheckedUpdateManyWithoutUsuarioInput = {
     id?: Prisma.IntFieldUpdateOperationsInput | number;
     fechaHora?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     userAgent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
 };
 export type AuditAccessSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
     id?: boolean;
     usuarioId?: boolean;
     fechaHora?: boolean;
-    ipAddress?: boolean;
     userAgent?: boolean;
     usuario?: boolean | Prisma.UserDefaultArgs<ExtArgs>;
 }, ExtArgs["result"]["auditAccess"]>;
@@ -360,7 +330,6 @@ export type AuditAccessSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
     id?: boolean;
     usuarioId?: boolean;
     fechaHora?: boolean;
-    ipAddress?: boolean;
     userAgent?: boolean;
     usuario?: boolean | Prisma.UserDefaultArgs<ExtArgs>;
 }, ExtArgs["result"]["auditAccess"]>;
@@ -368,7 +337,6 @@ export type AuditAccessSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
     id?: boolean;
     usuarioId?: boolean;
     fechaHora?: boolean;
-    ipAddress?: boolean;
     userAgent?: boolean;
     usuario?: boolean | Prisma.UserDefaultArgs<ExtArgs>;
 }, ExtArgs["result"]["auditAccess"]>;
@@ -376,10 +344,9 @@ export type AuditAccessSelectScalar = {
     id?: boolean;
     usuarioId?: boolean;
     fechaHora?: boolean;
-    ipAddress?: boolean;
     userAgent?: boolean;
 };
-export type AuditAccessOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "usuarioId" | "fechaHora" | "ipAddress" | "userAgent", ExtArgs["result"]["auditAccess"]>;
+export type AuditAccessOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "usuarioId" | "fechaHora" | "userAgent", ExtArgs["result"]["auditAccess"]>;
 export type AuditAccessInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     usuario?: boolean | Prisma.UserDefaultArgs<ExtArgs>;
 };
@@ -398,7 +365,6 @@ export type $AuditAccessPayload<ExtArgs extends runtime.Types.Extensions.Interna
         id: number;
         usuarioId: number;
         fechaHora: Date;
-        ipAddress: string | null;
         userAgent: string | null;
     }, ExtArgs["result"]["auditAccess"]>;
     composites: {};
@@ -461,7 +427,6 @@ export interface AuditAccessFieldRefs {
     readonly id: Prisma.FieldRef<"AuditAccess", 'Int'>;
     readonly usuarioId: Prisma.FieldRef<"AuditAccess", 'Int'>;
     readonly fechaHora: Prisma.FieldRef<"AuditAccess", 'DateTime'>;
-    readonly ipAddress: Prisma.FieldRef<"AuditAccess", 'String'>;
     readonly userAgent: Prisma.FieldRef<"AuditAccess", 'String'>;
 }
 export type AuditAccessFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {

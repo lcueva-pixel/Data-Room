@@ -6,7 +6,25 @@ export declare class ReportsService {
     private readonly prisma;
     constructor(prisma: PrismaService);
     findByRole(rolId: number): Promise<({
+        reportesRoles: ({
+            rol: {
+                id: number;
+                rolDescripcion: string;
+            };
+        } & {
+            rolId: number;
+            reporteId: number;
+        })[];
         children: ({
+            reportesRoles: ({
+                rol: {
+                    id: number;
+                    rolDescripcion: string;
+                };
+            } & {
+                rolId: number;
+                reporteId: number;
+            })[];
             children: ({
                 reportesRoles: ({
                     rol: {
@@ -19,50 +37,35 @@ export declare class ReportsService {
                 })[];
             } & {
                 id: number;
+                activo: boolean;
                 titulo: string;
                 descripcion: string | null;
                 urlIframe: string;
-                activo: boolean;
                 fechaRegistro: Date;
                 padreId: number | null;
             })[];
-            reportesRoles: ({
-                rol: {
-                    id: number;
-                    rolDescripcion: string;
-                };
-            } & {
-                rolId: number;
-                reporteId: number;
-            })[];
         } & {
             id: number;
+            activo: boolean;
             titulo: string;
             descripcion: string | null;
             urlIframe: string;
-            activo: boolean;
             fechaRegistro: Date;
             padreId: number | null;
         })[];
-        reportesRoles: ({
-            rol: {
-                id: number;
-                rolDescripcion: string;
-            };
-        } & {
-            rolId: number;
-            reporteId: number;
-        })[];
     } & {
         id: number;
+        activo: boolean;
         titulo: string;
         descripcion: string | null;
         urlIframe: string;
-        activo: boolean;
         fechaRegistro: Date;
         padreId: number | null;
     })[]>;
     findChildren(parentId: number): Promise<({
+        _count: {
+            children: number;
+        };
         reportesRoles: ({
             rol: {
                 id: number;
@@ -72,23 +75,19 @@ export declare class ReportsService {
             rolId: number;
             reporteId: number;
         })[];
-        _count: {
-            children: number;
-        };
     } & {
         id: number;
+        activo: boolean;
         titulo: string;
         descripcion: string | null;
         urlIframe: string;
-        activo: boolean;
         fechaRegistro: Date;
         padreId: number | null;
     })[]>;
     findAllAdmin(query: ListReportsQueryDto): Promise<import("../common/dto/paginated-response.dto").PaginatedResponse<{
-        padre: {
-            id: number;
-            titulo: string;
-        } | null;
+        _count: {
+            children: number;
+        };
         reportesRoles: ({
             rol: {
                 id: number;
@@ -98,15 +97,16 @@ export declare class ReportsService {
             rolId: number;
             reporteId: number;
         })[];
-        _count: {
-            children: number;
-        };
+        padre: {
+            id: number;
+            titulo: string;
+        } | null;
     } & {
         id: number;
+        activo: boolean;
         titulo: string;
         descripcion: string | null;
         urlIframe: string;
-        activo: boolean;
         fechaRegistro: Date;
         padreId: number | null;
     }>>;
@@ -117,10 +117,9 @@ export declare class ReportsService {
         message: string;
     }>;
     toggleActivo(id: number): Promise<{
-        padre: {
-            id: number;
-            titulo: string;
-        } | null;
+        _count: {
+            children: number;
+        };
         reportesRoles: ({
             rol: {
                 id: number;
@@ -130,15 +129,16 @@ export declare class ReportsService {
             rolId: number;
             reporteId: number;
         })[];
-        _count: {
-            children: number;
-        };
+        padre: {
+            id: number;
+            titulo: string;
+        } | null;
     } & {
         id: number;
+        activo: boolean;
         titulo: string;
         descripcion: string | null;
         urlIframe: string;
-        activo: boolean;
         fechaRegistro: Date;
         padreId: number | null;
     }>;

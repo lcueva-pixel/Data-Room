@@ -21,9 +21,8 @@ let AuthController = class AuthController {
         this.authService = authService;
     }
     async login(loginDto, req) {
-        const ipAddress = req.ip || req.headers['x-forwarded-for'] || '';
         const userAgent = req.headers['user-agent'] || '';
-        const user = await this.authService.validateUser(loginDto.email, loginDto.password, ipAddress, userAgent);
+        const user = await this.authService.validateUser(loginDto.email, loginDto.password, userAgent);
         return this.authService.login(user);
     }
 };
