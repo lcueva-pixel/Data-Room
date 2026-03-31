@@ -40,4 +40,9 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Boolean)
 ], UpdateReportDto.prototype, "activo", void 0);
+__decorate([
+    (0, class_validator_1.IsInt)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Object)
+], UpdateReportDto.prototype, "padreId", void 0);
 //# sourceMappingURL=update-report.dto.js.map

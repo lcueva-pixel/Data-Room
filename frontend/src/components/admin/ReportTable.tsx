@@ -137,7 +137,29 @@ export function ReportTable({
       }),
       columnHelper.accessor('titulo', {
         header: 'Título',
-        cell: (info) => <span className="font-medium text-slate-800 dark:text-gray-100">{info.getValue()}</span>,
+        cell: (info) => {
+          const report = info.row.original;
+          const childCount = report._count?.children ?? 0;
+          return (
+            <div className="flex items-center gap-2">
+              {report.padreId && (
+                <span className="text-sidebar-accent text-xs">↳</span>
+              )}
+              <span className={
+                report.padreId
+                  ? 'text-slate-600 dark:text-gray-300'
+                  : 'font-medium text-slate-800 dark:text-gray-100'
+              }>
+                {info.getValue()}
+              </span>
+              {childCount > 0 && (
+                <span className="text-[10px] bg-sidebar-accent/20 text-sidebar-accent px-1.5 py-0.5 rounded-full">
+                  {childCount} sub
+                </span>
+              )}
+            </div>
+          );
+        },
       }),
       columnHelper.accessor('reportesRoles', {
         header: 'Roles',

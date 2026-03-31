@@ -12,7 +12,11 @@ export interface Report {
   urlIframe: string;
   activo: boolean;
   fechaRegistro: string;
+  padreId: number | null;
   reportesRoles: ReportRole[];
+  children?: Report[];
+  padre?: { id: number; titulo: string } | null;
+  _count?: { children: number };
 }
 
 export interface CreateReportPayload {
@@ -21,6 +25,7 @@ export interface CreateReportPayload {
   descripcion?: string;
   rolesIds: number[];
   activo?: boolean;
+  padreId?: number | null;
 }
 
 export interface UpdateReportPayload {
@@ -29,6 +34,7 @@ export interface UpdateReportPayload {
   descripcion?: string;
   rolesIds?: number[];
   activo?: boolean;
+  padreId?: number | null;
 }
 
 export interface PaginatedReports {

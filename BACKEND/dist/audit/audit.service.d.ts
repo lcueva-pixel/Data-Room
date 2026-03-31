@@ -5,18 +5,18 @@ export declare class AuditService {
     private readonly prisma;
     constructor(prisma: PrismaService);
     registerAccess(record: AuditAccessRecord): Promise<{
+        id: number;
+        usuarioId: number;
         fechaHora: Date;
         ipAddress: string | null;
         userAgent: string | null;
-        id: number;
-        usuarioId: number;
     }>;
     findAll(): Promise<UnifiedAuditEntry[]>;
     registerReportView(usuarioId: number, dto: CreateReportViewDto): Promise<{
-        fechaHora: Date;
         id: number;
-        usuarioId: number;
-        duracion: number;
         reporteId: number;
+        usuarioId: number;
+        fechaHora: Date;
+        duracion: number;
     }>;
 }

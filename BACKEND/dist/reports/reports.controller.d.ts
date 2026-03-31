@@ -6,6 +6,44 @@ export declare class ReportsController {
     private readonly reportsService;
     constructor(reportsService: ReportsService);
     findAll(req: any): Promise<({
+        children: ({
+            children: ({
+                reportesRoles: ({
+                    rol: {
+                        id: number;
+                        rolDescripcion: string;
+                    };
+                } & {
+                    rolId: number;
+                    reporteId: number;
+                })[];
+            } & {
+                id: number;
+                titulo: string;
+                descripcion: string | null;
+                urlIframe: string;
+                activo: boolean;
+                fechaRegistro: Date;
+                padreId: number | null;
+            })[];
+            reportesRoles: ({
+                rol: {
+                    id: number;
+                    rolDescripcion: string;
+                };
+            } & {
+                rolId: number;
+                reporteId: number;
+            })[];
+        } & {
+            id: number;
+            titulo: string;
+            descripcion: string | null;
+            urlIframe: string;
+            activo: boolean;
+            fechaRegistro: Date;
+            padreId: number | null;
+        })[];
         reportesRoles: ({
             rol: {
                 id: number;
@@ -22,8 +60,13 @@ export declare class ReportsController {
         urlIframe: string;
         activo: boolean;
         fechaRegistro: Date;
+        padreId: number | null;
     })[]>;
     findAllAdmin(query: ListReportsQueryDto): Promise<import("../common/dto/paginated-response.dto").PaginatedResponse<{
+        padre: {
+            id: number;
+            titulo: string;
+        } | null;
         reportesRoles: ({
             rol: {
                 id: number;
@@ -33,6 +76,9 @@ export declare class ReportsController {
             rolId: number;
             reporteId: number;
         })[];
+        _count: {
+            children: number;
+        };
     } & {
         id: number;
         titulo: string;
@@ -40,7 +86,30 @@ export declare class ReportsController {
         urlIframe: string;
         activo: boolean;
         fechaRegistro: Date;
+        padreId: number | null;
     }>>;
+    findChildren(id: number): Promise<({
+        reportesRoles: ({
+            rol: {
+                id: number;
+                rolDescripcion: string;
+            };
+        } & {
+            rolId: number;
+            reporteId: number;
+        })[];
+        _count: {
+            children: number;
+        };
+    } & {
+        id: number;
+        titulo: string;
+        descripcion: string | null;
+        urlIframe: string;
+        activo: boolean;
+        fechaRegistro: Date;
+        padreId: number | null;
+    })[]>;
     create(createReportDto: CreateReportDto): Promise<{
         message: string;
     }>;
@@ -48,6 +117,10 @@ export declare class ReportsController {
         message: string;
     }>;
     toggleActivo(id: number): Promise<{
+        padre: {
+            id: number;
+            titulo: string;
+        } | null;
         reportesRoles: ({
             rol: {
                 id: number;
@@ -57,6 +130,9 @@ export declare class ReportsController {
             rolId: number;
             reporteId: number;
         })[];
+        _count: {
+            children: number;
+        };
     } & {
         id: number;
         titulo: string;
@@ -64,6 +140,7 @@ export declare class ReportsController {
         urlIframe: string;
         activo: boolean;
         fechaRegistro: Date;
+        padreId: number | null;
     }>;
     remove(id: number): Promise<{
         message: string;

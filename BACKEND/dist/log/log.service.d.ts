@@ -10,15 +10,15 @@ export declare class LogService {
         };
     } & {
         id: number;
-        fechaHora: Date;
         usuarioId: number;
+        fechaHora: Date;
         accion: string;
         detalle: string | null;
     })[]>;
     register(record: LogActivityRecord): Promise<{
         id: number;
-        fechaHora: Date;
         usuarioId: number;
+        fechaHora: Date;
         accion: string;
         detalle: string | null;
     }>;

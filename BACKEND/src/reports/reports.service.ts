@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateReportDto } from './dto/create-report.dto';
 import { UpdateReportDto } from './dto/update-report.dto';
@@ -15,32 +15,77 @@ function toValidSortField(field?: string): ValidSortField {
   return 'id';
 }
 
-const REPORT_INCLUDE = {
+// Include para tabla admin — trae referencia al padre y conteo de hijos
+const REPORT_INCLUDE_ADMIN = {
   reportesRoles: { include: { rol: true } },
+  padre: { select: { id: true, titulo: true } },
+  _count: { select: { children: true } },
 } as const;
 
 @Injectable()
 export class ReportsService {
   constructor(private readonly prisma: PrismaService) {}
 
+  // ── Endpoint público (Sidebar) — solo raíces con children recursivos ──
   async findByRole(rolId: number) {
+    const childrenInclude = {
+      reportesRoles: { include: { rol: true } },
+      children: {
+        where: { activo: true },
+        include: {
+          reportesRoles: { include: { rol: true } },
+          children: {
+            where: { activo: true },
+            include: { reportesRoles: { include: { rol: true } } },
+            orderBy: { id: 'asc' as const },
+          },
+        },
+        orderBy: { id: 'asc' as const },
+      },
+    };
+
     if (rolId === 1) {
       return this.prisma.report.findMany({
-        where: { activo: true },
-        include: REPORT_INCLUDE,
+        where: { activo: true, padreId: null },
+        include: childrenInclude,
         orderBy: { id: 'asc' },
       });
     }
+
     return this.prisma.report.findMany({
-      where: {
-        activo: true,
-        reportesRoles: { some: { rolId } },
+      where: { activo: true, padreId: null, reportesRoles: { some: { rolId } } },
+      include: {
+        reportesRoles: { include: { rol: true } },
+        children: {
+          where: { activo: true, reportesRoles: { some: { rolId } } },
+          include: {
+            reportesRoles: { include: { rol: true } },
+            children: {
+              where: { activo: true, reportesRoles: { some: { rolId } } },
+              include: { reportesRoles: { include: { rol: true } } },
+              orderBy: { id: 'asc' as const },
+            },
+          },
+          orderBy: { id: 'asc' as const },
+        },
       },
-      include: REPORT_INCLUDE,
       orderBy: { id: 'asc' },
     });
   }
 
+  // ── Hijos directos de un reporte (modal de edición) ───────────────────
+  async findChildren(parentId: number) {
+    return this.prisma.report.findMany({
+      where: { padreId: parentId },
+      include: {
+        reportesRoles: { include: { rol: true } },
+        _count: { select: { children: true } },
+      },
+      orderBy: { id: 'asc' },
+    });
+  }
+
+  // ── Tabla admin paginada ──────────────────────────────────────────────
   async findAllAdmin(query: ListReportsQueryDto) {
     const page = query.page ?? 1;
     const limit = query.limit ?? 5;
@@ -64,7 +109,7 @@ export class ReportsService {
         skip,
         take: limit,
         orderBy: { [sortBy]: order },
-        include: REPORT_INCLUDE,
+        include: REPORT_INCLUDE_ADMIN,
       }),
       this.prisma.report.count({ where }),
     ]);
@@ -72,13 +117,21 @@ export class ReportsService {
     return buildPaginatedResponse(data, total, page, limit);
   }
 
+  // ── Crear reporte (con padreId opcional) ──────────────────────────────
   async create(dto: CreateReportDto) {
+    if (dto.padreId != null) {
+      await this.prisma.report.findUniqueOrThrow({
+        where: { id: dto.padreId },
+      });
+    }
+
     await this.prisma.report.create({
       data: {
         titulo: dto.titulo,
         descripcion: dto.descripcion,
         urlIframe: dto.urlIframe,
         activo: dto.activo ?? true,
+        padreId: dto.padreId ?? null,
         reportesRoles: {
           create: dto.rolesIds.map((rolId) => ({ rolId })),
         },
@@ -87,7 +140,31 @@ export class ReportsService {
     return { message: 'Reporte creado exitosamente' };
   }
 
+  // ── Actualizar reporte (con validación anti-circular) ─────────────────
   async update(id: number, dto: UpdateReportDto) {
+    if (dto.padreId !== undefined) {
+      if (dto.padreId === id) {
+        throw new BadRequestException(
+          'Un reporte no puede ser padre de sí mismo',
+        );
+      }
+      if (dto.padreId !== null) {
+        // Recorrer cadena de ancestros para detectar ciclos
+        let ancestorId: number | null = dto.padreId;
+        while (ancestorId !== null) {
+          if (ancestorId === id) {
+            throw new BadRequestException('Dependencia circular detectada');
+          }
+          const ancestor: { padreId: number | null } | null =
+            await this.prisma.report.findUnique({
+              where: { id: ancestorId },
+              select: { padreId: true },
+            });
+          ancestorId = ancestor?.padreId ?? null;
+        }
+      }
+    }
+
     await this.prisma.report.update({
       where: { id },
       data: {
@@ -95,6 +172,7 @@ export class ReportsService {
         ...(dto.urlIframe !== undefined && { urlIframe: dto.urlIframe }),
         ...(dto.descripcion !== undefined && { descripcion: dto.descripcion }),
         ...(dto.activo !== undefined && { activo: dto.activo }),
+        ...(dto.padreId !== undefined && { padreId: dto.padreId }),
         ...(dto.rolesIds !== undefined && {
           reportesRoles: {
             deleteMany: {},
@@ -107,11 +185,13 @@ export class ReportsService {
   }
 
   async toggleActivo(id: number) {
-    const report = await this.prisma.report.findUniqueOrThrow({ where: { id } });
+    const report = await this.prisma.report.findUniqueOrThrow({
+      where: { id },
+    });
     const updated = await this.prisma.report.update({
       where: { id },
       data: { activo: !report.activo },
-      include: REPORT_INCLUDE,
+      include: REPORT_INCLUDE_ADMIN,
     });
     return updated;
   }

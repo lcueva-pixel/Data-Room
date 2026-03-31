@@ -78,7 +78,8 @@ exports.ReportScalarFieldEnum = {
     descripcion: 'descripcion',
     urlIframe: 'urlIframe',
     activo: 'activo',
-    fechaRegistro: 'fechaRegistro'
+    fechaRegistro: 'fechaRegistro',
+    padreId: 'padreId'
 };
 exports.ReportRoleScalarFieldEnum = {
     reporteId: 'reporteId',

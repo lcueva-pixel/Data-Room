@@ -4,4 +4,5 @@ export declare class CreateReportDto {
     urlIframe: string;
     rolesIds: number[];
     activo?: boolean;
+    padreId?: number | null;
 }

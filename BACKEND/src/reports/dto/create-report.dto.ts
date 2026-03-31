@@ -19,4 +19,8 @@ export class CreateReportDto {
   @IsBoolean()
   @IsOptional()
   activo?: boolean;
+
+  @IsInt()
+  @IsOptional()
+  padreId?: number | null;
 }

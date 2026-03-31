@@ -30,6 +30,9 @@ let ReportsController = class ReportsController {
     async findAllAdmin(query) {
         return this.reportsService.findAllAdmin(query);
     }
+    async findChildren(id) {
+        return this.reportsService.findChildren(id);
+    }
     async create(createReportDto) {
         return this.reportsService.create(createReportDto);
     }
@@ -59,6 +62,14 @@ __decorate([
     __metadata("design:paramtypes", [list_reports_query_dto_1.ListReportsQueryDto]),
     __metadata("design:returntype", Promise)
 ], ReportsController.prototype, "findAllAdmin", null);
+__decorate([
+    (0, common_1.Get)(':id/children'),
+    (0, common_1.UseGuards)(admin_guard_1.AdminGuard),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], ReportsController.prototype, "findChildren", null);
 __decorate([
     (0, common_1.Post)(),
     (0, common_1.UseGuards)(admin_guard_1.AdminGuard),

@@ -20,27 +20,65 @@ function toValidSortField(field) {
     }
     return 'id';
 }
-const REPORT_INCLUDE = {
+const REPORT_INCLUDE_ADMIN = {
     reportesRoles: { include: { rol: true } },
+    padre: { select: { id: true, titulo: true } },
+    _count: { select: { children: true } },
 };
 let ReportsService = class ReportsService {
     constructor(prisma) {
         this.prisma = prisma;
     }
     async findByRole(rolId) {
+        const childrenInclude = {
+            reportesRoles: { include: { rol: true } },
+            children: {
+                where: { activo: true },
+                include: {
+                    reportesRoles: { include: { rol: true } },
+                    children: {
+                        where: { activo: true },
+                        include: { reportesRoles: { include: { rol: true } } },
+                        orderBy: { id: 'asc' },
+                    },
+                },
+                orderBy: { id: 'asc' },
+            },
+        };
         if (rolId === 1) {
             return this.prisma.report.findMany({
-                where: { activo: true },
-                include: REPORT_INCLUDE,
+                where: { activo: true, padreId: null },
+                include: childrenInclude,
                 orderBy: { id: 'asc' },
             });
         }
         return this.prisma.report.findMany({
-            where: {
-                activo: true,
-                reportesRoles: { some: { rolId } },
+            where: { activo: true, padreId: null, reportesRoles: { some: { rolId } } },
+            include: {
+                reportesRoles: { include: { rol: true } },
+                children: {
+                    where: { activo: true, reportesRoles: { some: { rolId } } },
+                    include: {
+                        reportesRoles: { include: { rol: true } },
+                        children: {
+                            where: { activo: true, reportesRoles: { some: { rolId } } },
+                            include: { reportesRoles: { include: { rol: true } } },
+                            orderBy: { id: 'asc' },
+                        },
+                    },
+                    orderBy: { id: 'asc' },
+                },
             },
-            include: REPORT_INCLUDE,
+            orderBy: { id: 'asc' },
+        });
+    }
+    async findChildren(parentId) {
+        return this.prisma.report.findMany({
+            where: { padreId: parentId },
+            include: {
+                reportesRoles: { include: { rol: true } },
+                _count: { select: { children: true } },
+            },
             orderBy: { id: 'asc' },
         });
     }
@@ -66,20 +104,26 @@ let ReportsService = class ReportsService {
                 skip,
                 take: limit,
                 orderBy: { [sortBy]: order },
-                include: REPORT_INCLUDE,
+                include: REPORT_INCLUDE_ADMIN,
             }),
             this.prisma.report.count({ where }),
         ]);
         return (0, paginated_response_dto_1.buildPaginatedResponse)(data, total, page, limit);
     }
     async create(dto) {
-        var _a;
+        var _a, _b;
+        if (dto.padreId != null) {
+            await this.prisma.report.findUniqueOrThrow({
+                where: { id: dto.padreId },
+            });
+        }
         await this.prisma.report.create({
             data: {
                 titulo: dto.titulo,
                 descripcion: dto.descripcion,
                 urlIframe: dto.urlIframe,
                 activo: (_a = dto.activo) !== null && _a !== void 0 ? _a : true,
+                padreId: (_b = dto.padreId) !== null && _b !== void 0 ? _b : null,
                 reportesRoles: {
                     create: dto.rolesIds.map((rolId) => ({ rolId })),
                 },
@@ -88,6 +132,25 @@ let ReportsService = class ReportsService {
         return { message: 'Reporte creado exitosamente' };
     }
     async update(id, dto) {
+        var _a;
+        if (dto.padreId !== undefined) {
+            if (dto.padreId === id) {
+                throw new common_1.BadRequestException('Un reporte no puede ser padre de sí mismo');
+            }
+            if (dto.padreId !== null) {
+                let ancestorId = dto.padreId;
+                while (ancestorId !== null) {
+                    if (ancestorId === id) {
+                        throw new common_1.BadRequestException('Dependencia circular detectada');
+                    }
+                    const ancestor = await this.prisma.report.findUnique({
+                        where: { id: ancestorId },
+                        select: { padreId: true },
+                    });
+                    ancestorId = (_a = ancestor === null || ancestor === void 0 ? void 0 : ancestor.padreId) !== null && _a !== void 0 ? _a : null;
+                }
+            }
+        }
         await this.prisma.report.update({
             where: { id },
             data: {
@@ -95,6 +158,7 @@ let ReportsService = class ReportsService {
                 ...(dto.urlIframe !== undefined && { urlIframe: dto.urlIframe }),
                 ...(dto.descripcion !== undefined && { descripcion: dto.descripcion }),
                 ...(dto.activo !== undefined && { activo: dto.activo }),
+                ...(dto.padreId !== undefined && { padreId: dto.padreId }),
                 ...(dto.rolesIds !== undefined && {
                     reportesRoles: {
                         deleteMany: {},
@@ -106,11 +170,13 @@ let ReportsService = class ReportsService {
         return { message: 'Reporte actualizado exitosamente' };
     }
     async toggleActivo(id) {
-        const report = await this.prisma.report.findUniqueOrThrow({ where: { id } });
+        const report = await this.prisma.report.findUniqueOrThrow({
+            where: { id },
+        });
         const updated = await this.prisma.report.update({
             where: { id },
             data: { activo: !report.activo },
-            include: REPORT_INCLUDE,
+            include: REPORT_INCLUDE_ADMIN,
         });
         return updated;
     }

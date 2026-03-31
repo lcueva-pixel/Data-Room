@@ -22,6 +22,12 @@ export class ReportsController {
     return this.reportsService.findAllAdmin(query);
   }
 
+  @Get(':id/children')
+  @UseGuards(AdminGuard)
+  async findChildren(@Param('id', ParseIntPipe) id: number) {
+    return this.reportsService.findChildren(id);
+  }
+
   @Post()
   @UseGuards(AdminGuard)
   async create(@Body() createReportDto: CreateReportDto) {
