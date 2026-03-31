@@ -35,7 +35,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const data = response.data;
     saveSession(data);
     setSession({ access_token: data.access_token, rol_id: data.rol_id });
-    router.push('/dashboard');
+    router.push('/dashboard/overview');
   }, [router]);
 
   const logout = useCallback(() => {
