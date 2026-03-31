@@ -28,33 +28,47 @@ const NAV_ACTIVE =
 const NAV_INACTIVE =
   'text-gray-400 border-l-transparent hover:bg-sidebar-hover hover:border-l-sidebar-accent hover:text-white';
 
+// ── Helpers: verificar si un hijo está seleccionado ──────────────────
+function hasSelectedChild(report: Report, selectedId: number | undefined): boolean {
+  if (!selectedId || !report.children) return false;
+  for (const child of report.children) {
+    if (child.id === selectedId) return true;
+    if (hasSelectedChild(child, selectedId)) return true;
+  }
+  return false;
+}
+
 // ── Componente recursivo para reportes con hijos ──────────────────────
 function SidebarReportItem({
   report,
   selectedReport,
   onSelect,
   expandedIds,
-  onToggleExpand,
+  setExpanded,
   depth = 0,
 }: {
   report: Report;
   selectedReport: Report | null;
   onSelect: (r: Report) => void;
   expandedIds: Set<number>;
-  onToggleExpand: (id: number) => void;
+  setExpanded: (id: number, open: boolean) => void;
   depth?: number;
 }) {
   const hasChildren = report.children && report.children.length > 0;
   const isExpanded = expandedIds.has(report.id);
   const isActive = selectedReport?.id === report.id;
+  const childSelected = hasSelectedChild(report, selectedReport?.id);
 
   return (
-    <div>
+    <div
+      onMouseEnter={() => { if (hasChildren) setExpanded(report.id, true); }}
+      onMouseLeave={() => {
+        // No colapsar si un hijo está seleccionado
+        if (hasChildren && !childSelected && !isActive) setExpanded(report.id, false);
+      }}
+    >
       <button
-        onClick={() => {
-          if (hasChildren) onToggleExpand(report.id);
-          onSelect(report);
-        }}
+        onClick={() => onSelect(report)}
         className={clsx(NAV_BASE, 'w-full text-left', isActive ? NAV_ACTIVE : NAV_INACTIVE)}
         style={{ paddingLeft: `${12 + depth * 16}px` }}
       >
@@ -79,7 +93,7 @@ function SidebarReportItem({
               selectedReport={selectedReport}
               onSelect={onSelect}
               expandedIds={expandedIds}
-              onToggleExpand={onToggleExpand}
+              setExpanded={setExpanded}
               depth={depth + 1}
             />
           ))}
@@ -106,11 +120,11 @@ export function Sidebar({
   // ── Acordeón ────────────────────────────────────────────────────────
   const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
 
-  const toggleExpand = (id: number) => {
+  const setExpanded = (id: number, open: boolean) => {
     setExpandedIds((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
+      if (open) next.add(id);
+      else next.delete(id);
       return next;
     });
   };
@@ -222,7 +236,7 @@ export function Sidebar({
                 selectedReport={selectedReport}
                 onSelect={handleReportSelect}
                 expandedIds={expandedIds}
-                onToggleExpand={toggleExpand}
+                setExpanded={setExpanded}
               />
             ))
           )}
