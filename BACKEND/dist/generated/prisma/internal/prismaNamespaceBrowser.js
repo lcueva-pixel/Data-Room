@@ -89,7 +89,6 @@ exports.AuditAccessScalarFieldEnum = {
     id: 'id',
     usuarioId: 'usuarioId',
     fechaHora: 'fechaHora',
-    ipAddress: 'ipAddress',
     userAgent: 'userAgent'
 };
 exports.LogActivityScalarFieldEnum = {

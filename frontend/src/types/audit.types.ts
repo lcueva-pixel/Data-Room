@@ -11,3 +11,19 @@ export interface AuditEntry {
   };
   duracion?: number;
 }
+
+export interface PaginatedAudit {
+  data: AuditEntry[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
+
+export interface AuditListQuery {
+  page?: number;
+  limit?: number;
+  search?: string;
+}

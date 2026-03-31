@@ -1,6 +1,5 @@
 export interface AuditAccessRecord {
     usuarioId: number;
-    ipAddress?: string;
     userAgent?: string;
 }
 export interface UnifiedAuditEntry {

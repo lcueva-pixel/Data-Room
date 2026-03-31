@@ -16,14 +16,15 @@ exports.AuditController = void 0;
 const common_1 = require("@nestjs/common");
 const audit_service_1 = require("./audit.service");
 const create_report_view_dto_1 = require("./dto/create-report-view.dto");
+const pagination_query_dto_1 = require("../common/dto/pagination-query.dto");
 const jwt_auth_guard_1 = require("../auth/jwt-auth.guard");
 const admin_guard_1 = require("../auth/admin.guard");
 let AuditController = class AuditController {
     constructor(auditService) {
         this.auditService = auditService;
     }
-    findAll() {
-        return this.auditService.findAll();
+    findAll(query) {
+        return this.auditService.findAll(query);
     }
     async registerReportTime(req, dto) {
         try {
@@ -39,8 +40,9 @@ exports.AuditController = AuditController;
 __decorate([
     (0, common_1.Get)(),
     (0, common_1.UseGuards)(admin_guard_1.AdminGuard),
+    __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [pagination_query_dto_1.PaginationQueryDto]),
     __metadata("design:returntype", void 0)
 ], AuditController.prototype, "findAll", null);
 __decorate([

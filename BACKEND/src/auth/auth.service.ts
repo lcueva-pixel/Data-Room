@@ -13,7 +13,6 @@ export class AuthService {
   async validateUser(
     email: string,
     password: string,
-    ipAddress: string,
     userAgent: string,
   ) {
     const user = await this.prisma.user.findFirst({
@@ -30,7 +29,7 @@ export class AuthService {
     }
 
     await this.prisma.auditAccess.create({
-      data: { usuarioId: user.id, ipAddress, userAgent },
+      data: { usuarioId: user.id, userAgent },
     });
 
     return user;

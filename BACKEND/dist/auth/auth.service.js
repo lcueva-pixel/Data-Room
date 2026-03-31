@@ -52,7 +52,7 @@ let AuthService = class AuthService {
         this.prisma = prisma;
         this.jwtService = jwtService;
     }
-    async validateUser(email, password, ipAddress, userAgent) {
+    async validateUser(email, password, userAgent) {
         const user = await this.prisma.user.findFirst({
             where: { email, activo: true },
         });
@@ -64,7 +64,7 @@ let AuthService = class AuthService {
             throw new common_1.UnauthorizedException('Credenciales incorrectas');
         }
         await this.prisma.auditAccess.create({
-            data: { usuarioId: user.id, ipAddress, userAgent },
+            data: { usuarioId: user.id, userAgent },
         });
         return user;
     }

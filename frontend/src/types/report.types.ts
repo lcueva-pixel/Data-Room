@@ -19,6 +19,7 @@ export interface Report {
   _count?: { children: number };
 }
 
+
 export interface CreateReportPayload {
   titulo: string;
   urlIframe: string;

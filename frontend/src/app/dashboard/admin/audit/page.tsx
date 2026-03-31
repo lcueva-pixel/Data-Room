@@ -4,7 +4,7 @@ import { useAudit } from '@/hooks/useAudit';
 import { AuditTable } from '@/components/admin/AuditTable';
 
 export default function AuditPage() {
-  const { entries, isLoading, error, refetch } = useAudit();
+  const { entries, meta, isLoading, query, setPage, setSearch, setLimit } = useAudit();
 
   return (
     <div className="space-y-6">
@@ -17,9 +17,12 @@ export default function AuditPage() {
 
       <AuditTable
         entries={entries}
+        meta={meta}
         isLoading={isLoading}
-        error={error}
-        onRefetch={refetch}
+        query={query}
+        onSearch={setSearch}
+        onPageChange={setPage}
+        onLimitChange={setLimit}
       />
     </div>
   );

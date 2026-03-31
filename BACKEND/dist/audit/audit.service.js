@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuditService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
+const paginated_response_dto_1 = require("../common/dto/paginated-response.dto");
 let AuditService = class AuditService {
     constructor(prisma) {
         this.prisma = prisma;
@@ -20,12 +21,14 @@ let AuditService = class AuditService {
         return this.prisma.auditAccess.create({
             data: {
                 usuarioId: record.usuarioId,
-                ipAddress: record.ipAddress,
                 userAgent: record.userAgent,
             },
         });
     }
-    async findAll() {
+    async findAll(query) {
+        var _a, _b;
+        const page = (_a = query.page) !== null && _a !== void 0 ? _a : 1;
+        const limit = (_b = query.limit) !== null && _b !== void 0 ? _b : 10;
         const [accesos, visualizaciones] = await Promise.all([
             this.prisma.auditAccess.findMany({
                 select: {
@@ -60,10 +63,21 @@ let AuditService = class AuditService {
             reporte: { titulo: v.reporte.titulo },
             duracion: v.duracion,
         }));
-        return [...entriesAcceso, ...entriesVista].sort((a, b) => new Date(b.fechaHora).getTime() - new Date(a.fechaHora).getTime());
+        let entries = [...entriesAcceso, ...entriesVista];
+        if (query.search) {
+            const s = query.search.toLowerCase();
+            entries = entries.filter((e) => e.usuario.nombreCompleto.toLowerCase().includes(s) ||
+                e.usuario.email.toLowerCase().includes(s));
+        }
+        entries.sort((a, b) => new Date(b.fechaHora).getTime() - new Date(a.fechaHora).getTime());
+        const total = entries.length;
+        const paginated = entries.slice((page - 1) * limit, page * limit);
+        return (0, paginated_response_dto_1.buildPaginatedResponse)(paginated, total, page, limit);
     }
     async registerReportView(usuarioId, dto) {
-        await this.prisma.report.findUniqueOrThrow({ where: { id: dto.reporteId } });
+        await this.prisma.report.findUniqueOrThrow({
+            where: { id: dto.reporteId },
+        });
         return this.prisma.reportViewLog.create({
             data: {
                 usuarioId,
