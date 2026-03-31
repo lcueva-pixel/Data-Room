@@ -17,6 +17,7 @@ export default function DashboardPage() {
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
   const [mounted, setMounted] = useState(false);
   const [rolId, setRolId] = useState<number | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -36,7 +37,7 @@ export default function DashboardPage() {
   const activeTitle = selectedReport?.titulo ?? 'Panel de Reportes';
 
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-100">
+    <div className="flex h-screen overflow-hidden bg-slate-100 dark:bg-sidebar-main">
       {/* Sidebar */}
       <Sidebar
         reports={reports}
@@ -45,6 +46,8 @@ export default function DashboardPage() {
         onReportSelect={setSelectedReport}
         onLogout={logout}
         rolId={rolId}
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
       />
 
       {/* Área principal */}
@@ -54,10 +57,11 @@ export default function DashboardPage() {
           activeTitle={activeTitle}
           rolId={rolId}
           onLogout={logout}
+          onMenuToggle={() => setSidebarOpen((v) => !v)}
         />
 
         {/* Contenido */}
-        <main className="flex-1 overflow-y-auto p-6">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6">
           {isLoading ? (
             // Skeleton de carga
             <div className="flex flex-col gap-3 h-full">

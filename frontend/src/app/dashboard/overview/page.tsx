@@ -81,6 +81,7 @@ export default function OverviewPage() {
   const { logout } = useAuth();
   const { reports, isLoading } = useReports();
   const rolId = getRolId();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState<SelectedDocument | null>(null);
@@ -105,11 +106,13 @@ export default function OverviewPage() {
         onReportSelect={() => router.push('/dashboard')}
         onLogout={logout}
         rolId={rolId}
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
       />
 
       {/* Área principal */}
       <div className="flex flex-col flex-1 overflow-hidden">
-        <TopBar activeTitle="Overview" rolId={rolId} onLogout={logout} />
+        <TopBar activeTitle="Overview" rolId={rolId} onLogout={logout} onMenuToggle={() => setSidebarOpen((v) => !v)} />
 
         <main className="flex-1 overflow-y-auto p-6">
           {/* Breadcrumb de página */}
