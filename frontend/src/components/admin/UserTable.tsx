@@ -8,6 +8,7 @@ import {
   createColumnHelper,
 } from '@tanstack/react-table';
 import { Plus, Pencil, ChevronsUpDown, ChevronUp, ChevronDown } from 'lucide-react';
+import clsx from 'clsx';
 import { ToggleSwitch } from '@/components/ui/ToggleSwitch';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import type { User, Role, PaginatedMeta, UserListQuery } from '@/types/user.types';
@@ -68,7 +69,7 @@ function PaginationBar({
         <button
           onClick={() => onPageChange(page - 1)}
           disabled={page <= 1}
-          className="px-2 py-1 rounded hover:bg-slate-100 dark:hover:bg-sidebar-main disabled:opacity-40 disabled:cursor-not-allowed"
+          className="px-2 py-1 min-h-[44px] rounded hover:bg-slate-100 dark:hover:bg-sidebar-main disabled:opacity-40 disabled:cursor-not-allowed"
         >
           ←
         </button>
@@ -79,7 +80,7 @@ function PaginationBar({
             <button
               key={p}
               onClick={() => onPageChange(p as number)}
-              className={`px-2.5 py-1 rounded font-medium ${
+              className={`px-2.5 py-1 min-h-[44px] rounded font-medium ${
                 p === page
                   ? 'bg-sidebar-main text-white'
                   : 'hover:bg-slate-100 dark:hover:bg-sidebar-main'
@@ -92,7 +93,7 @@ function PaginationBar({
         <button
           onClick={() => onPageChange(page + 1)}
           disabled={page >= totalPages}
-          className="px-2 py-1 rounded hover:bg-slate-100 dark:hover:bg-sidebar-main disabled:opacity-40 disabled:cursor-not-allowed"
+          className="px-2 py-1 min-h-[44px] rounded hover:bg-slate-100 dark:hover:bg-sidebar-main disabled:opacity-40 disabled:cursor-not-allowed"
         >
           →
         </button>
@@ -136,6 +137,7 @@ export function UserTable({
     () => [
       columnHelper.accessor('id', {
         header: 'ID',
+        meta: { className: 'hidden sm:table-cell' },
         cell: (info) => <span className="text-slate-400 dark:text-gray-500">{info.getValue()}</span>,
       }),
       columnHelper.accessor('nombreCompleto', {
@@ -157,10 +159,12 @@ export function UserTable({
       columnHelper.accessor('activo', {
         header: 'Estado',
         cell: (info) => (
-          <ToggleSwitch
-            checked={info.getValue()}
-            onChange={() => setConfirmUser(info.row.original)}
-          />
+          <div className="flex items-center min-h-[44px]">
+            <ToggleSwitch
+              checked={info.getValue()}
+              onChange={() => setConfirmUser(info.row.original)}
+            />
+          </div>
         ),
       }),
       columnHelper.display({
@@ -169,7 +173,7 @@ export function UserTable({
         cell: (info) => (
           <button
             onClick={() => onEdit(info.row.original)}
-            className="p-1.5 text-slate-400 dark:text-gray-500 hover:text-sidebar-accent hover:bg-sidebar-accent/10 rounded transition-colors"
+            className="min-w-[44px] min-h-[44px] flex items-center justify-center text-slate-400 dark:text-gray-500 hover:text-sidebar-accent hover:bg-sidebar-accent/10 rounded transition-colors"
             title="Editar"
           >
             <Pencil className="w-4 h-4" />
@@ -246,59 +250,66 @@ export function UserTable({
       </div>
 
       {/* Tabla */}
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="bg-slate-50 dark:bg-sidebar-main/60 border-b border-slate-200 dark:border-white/10">
-              {table.getHeaderGroups().map((hg) =>
-                hg.headers.map((header) => {
-                  const isSortable = ['nombreCompleto', 'email'].includes(header.id);
-                  return (
-                    <th
-                      key={header.id}
-                      className={isSortable ? thSortable : thBase}
-                      onClick={isSortable ? () => handleSort(header.id) : undefined}
-                    >
-                      <span className="inline-flex items-center">
-                        {flexRender(header.column.columnDef.header, header.getContext())}
-                        {isSortable && <SortIcon column={header.id} query={query} />}
-                      </span>
-                    </th>
-                  );
-                }),
-              )}
-            </tr>
-          </thead>
-          <tbody>
-            {isLoading ? (
-              Array.from({ length: 5 }).map((_, i) => (
-                <tr key={i} className="border-b border-slate-100 dark:border-white/5">
-                  {Array.from({ length: 6 }).map((_, j) => (
-                    <td key={j} className="px-6 py-4">
-                      <div className="h-4 bg-slate-200 dark:bg-white/10 rounded animate-pulse" />
-                    </td>
-                  ))}
-                </tr>
-              ))
-            ) : users.length === 0 ? (
-              <tr>
-                <td colSpan={6} className="px-6 py-8 text-center text-slate-400 dark:text-gray-500">
-                  No se encontraron usuarios con los filtros aplicados
-                </td>
+      <div className="relative">
+        <div className="absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-white dark:from-sidebar-hover to-transparent pointer-events-none z-10 lg:hidden" />
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm min-w-[700px]">
+            <thead>
+              <tr className="bg-slate-50 dark:bg-sidebar-main/60 border-b border-slate-200 dark:border-white/10">
+                {table.getHeaderGroups().map((hg) =>
+                  hg.headers.map((header) => {
+                    const isSortable = ['nombreCompleto', 'email'].includes(header.id);
+                    const metaCls = (header.column.columnDef.meta as any)?.className;
+                    return (
+                      <th
+                        key={header.id}
+                        className={clsx(isSortable ? thSortable : thBase, metaCls)}
+                        onClick={isSortable ? () => handleSort(header.id) : undefined}
+                      >
+                        <span className="inline-flex items-center">
+                          {flexRender(header.column.columnDef.header, header.getContext())}
+                          {isSortable && <SortIcon column={header.id} query={query} />}
+                        </span>
+                      </th>
+                    );
+                  }),
+                )}
               </tr>
-            ) : (
-              table.getRowModel().rows.map((row) => (
-                <tr key={row.id} className="border-b border-slate-100 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-sidebar-main/40 transition-colors">
-                  {row.getVisibleCells().map((cell) => (
-                    <td key={cell.id} className="px-6 py-3">
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </td>
-                  ))}
+            </thead>
+            <tbody>
+              {isLoading ? (
+                Array.from({ length: 5 }).map((_, i) => (
+                  <tr key={i} className="border-b border-slate-100 dark:border-white/5">
+                    {Array.from({ length: 6 }).map((_, j) => (
+                      <td key={j} className="px-6 py-4">
+                        <div className="h-4 bg-slate-200 dark:bg-white/10 rounded animate-pulse" />
+                      </td>
+                    ))}
+                  </tr>
+                ))
+              ) : users.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-6 py-8 text-center text-slate-400 dark:text-gray-500">
+                    No se encontraron usuarios con los filtros aplicados
+                  </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : (
+                table.getRowModel().rows.map((row) => (
+                  <tr key={row.id} className="border-b border-slate-100 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-sidebar-main/40 transition-colors">
+                    {row.getVisibleCells().map((cell) => {
+                      const metaCls = (cell.column.columnDef.meta as any)?.className;
+                      return (
+                        <td key={cell.id} className={clsx('px-6 py-3', metaCls)}>
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* Paginación */}
