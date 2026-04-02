@@ -18,9 +18,10 @@ export class LogService {
   async register(record: LogActivityRecord) {
     return this.prisma.logActivity.create({
       data: {
-        usuarioId: record.usuarioId,
+        usuarioId: record.usuarioId ?? null,
         accion: record.accion,
         detalle: record.detalle,
+        nivel: record.nivel ?? 'INFO',
       },
     });
   }
