@@ -178,7 +178,7 @@ Retry-After: 45
 
 {
   "statusCode": 429,
-  "message": "ThrottlerException: Too Many Requests"
+  "message": "ThrottlerException: Demasiados intentos de inicio de sesión, vuelva intentar en un minuto"
 }
 ```
 
