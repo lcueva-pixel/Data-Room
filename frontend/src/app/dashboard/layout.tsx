@@ -1,8 +1,7 @@
 import type { Metadata } from 'next';
-import { AuthProvider } from '@/context/AuthContext';
 
 export const metadata: Metadata = {
-  title: 'Dashboard — Dtata Room',
+  title: 'Dashboard — Data Room',
 };
 
 export default function DashboardLayout({
@@ -10,5 +9,5 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <AuthProvider>{children}</AuthProvider>;
+  return <>{children}</>;
 }
