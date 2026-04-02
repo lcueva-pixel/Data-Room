@@ -9,6 +9,7 @@ import {
 } from '@tanstack/react-table';
 import { Plus, Pencil, ChevronsUpDown, ChevronUp, ChevronDown } from 'lucide-react';
 import { ToggleSwitch } from '@/components/ui/ToggleSwitch';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import type { Report, ReportListQuery } from '@/types/report.types';
 import type { PaginatedMeta } from '@/types/user.types';
 
@@ -115,6 +116,7 @@ export function ReportTable({
   onToggleActivo,
 }: ReportTableProps) {
   const [searchValue, setSearchValue] = useState(query.search ?? '');
+  const [confirmReport, setConfirmReport] = useState<Report | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -185,7 +187,7 @@ export function ReportTable({
         cell: (info) => (
           <ToggleSwitch
             checked={info.getValue()}
-            onChange={() => onToggleActivo(info.row.original)}
+            onChange={() => setConfirmReport(info.row.original)}
           />
         ),
       }),
@@ -335,6 +337,24 @@ export function ReportTable({
       {meta && meta.totalPages > 0 && (
         <PaginationBar meta={meta} onPageChange={onPageChange} />
       )}
+
+      {/* Dialogo de confirmacion */}
+      <ConfirmDialog
+        isOpen={!!confirmReport}
+        title="Confirmar cambio de estado"
+        message={
+          confirmReport
+            ? `¿Deseas ${confirmReport.activo ? 'desactivar' : 'activar'} el reporte "${confirmReport.titulo}"?`
+            : ''
+        }
+        confirmLabel={confirmReport?.activo ? 'Desactivar' : 'Activar'}
+        variant={confirmReport?.activo ? 'danger' : 'warning'}
+        onConfirm={() => {
+          if (confirmReport) onToggleActivo(confirmReport);
+          setConfirmReport(null);
+        }}
+        onCancel={() => setConfirmReport(null)}
+      />
     </div>
   );
 }
