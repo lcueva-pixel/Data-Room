@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
+import { LogService } from '../log/log.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ListUsersQueryDto } from './dto/list-users-query.dto';
@@ -18,7 +19,10 @@ function toValidSortField(field?: string): ValidSortField {
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly logService: LogService,
+  ) {}
 
   async findAll(query: ListUsersQueryDto) {
     const page = query.page ?? 1;
@@ -60,7 +64,7 @@ export class UsersService {
     return buildPaginatedResponse(data, total, page, limit);
   }
 
-  async create(dto: CreateUserDto) {
+  async create(dto: CreateUserDto, executorId: number) {
     const hash = await bcrypt.hash(dto.password, 10);
     await this.prisma.user.create({
       data: {
@@ -71,10 +75,15 @@ export class UsersService {
         activo: dto.activo ?? true,
       },
     });
+    await this.logService.register({
+      usuarioId: executorId,
+      accion: 'CREAR_USUARIO',
+      detalle: `Usuario creado: ${dto.email}`,
+    });
     return { message: 'Usuario creado exitosamente' };
   }
 
-  async update(id: number, dto: UpdateUserDto) {
+  async update(id: number, dto: UpdateUserDto, executorId: number) {
     const data: Record<string, unknown> = {};
     if (dto.nombreCompleto !== undefined) data.nombreCompleto = dto.nombreCompleto;
     if (dto.email !== undefined) data.email = dto.email;
@@ -84,10 +93,15 @@ export class UsersService {
       data.passwordHash = await bcrypt.hash(dto.password, 10);
     }
     await this.prisma.user.update({ where: { id }, data });
+    await this.logService.register({
+      usuarioId: executorId,
+      accion: 'ACTUALIZAR_USUARIO',
+      detalle: `Usuario actualizado: id=${id}`,
+    });
     return { message: 'Usuario actualizado exitosamente' };
   }
 
-  async toggleActivo(id: number) {
+  async toggleActivo(id: number, executorId: number) {
     const user = await this.prisma.user.findUniqueOrThrow({ where: { id } });
     const updated = await this.prisma.user.update({
       where: { id },
@@ -102,13 +116,23 @@ export class UsersService {
         rol: { select: { rolDescripcion: true } },
       },
     });
+    await this.logService.register({
+      usuarioId: executorId,
+      accion: 'TOGGLE_USUARIO',
+      detalle: `Usuario id=${id}: ${updated.activo ? 'activado' : 'desactivado'}`,
+    });
     return updated;
   }
 
-  async remove(id: number) {
+  async remove(id: number, executorId: number) {
     await this.prisma.user.update({
       where: { id },
       data: { activo: false },
+    });
+    await this.logService.register({
+      usuarioId: executorId,
+      accion: 'DESACTIVAR_USUARIO',
+      detalle: `Usuario desactivado: id=${id}`,
     });
     return { message: 'Usuario desactivado exitosamente' };
   }
