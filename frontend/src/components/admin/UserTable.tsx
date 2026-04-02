@@ -9,6 +9,7 @@ import {
 } from '@tanstack/react-table';
 import { Plus, Pencil, ChevronsUpDown, ChevronUp, ChevronDown } from 'lucide-react';
 import { ToggleSwitch } from '@/components/ui/ToggleSwitch';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import type { User, Role, PaginatedMeta, UserListQuery } from '@/types/user.types';
 
 interface UserTableProps {
@@ -116,6 +117,7 @@ export function UserTable({
   onToggleActivo,
 }: UserTableProps) {
   const [searchValue, setSearchValue] = useState(query.search ?? '');
+  const [confirmUser, setConfirmUser] = useState<User | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -157,7 +159,7 @@ export function UserTable({
         cell: (info) => (
           <ToggleSwitch
             checked={info.getValue()}
-            onChange={() => onToggleActivo(info.row.original)}
+            onChange={() => setConfirmUser(info.row.original)}
           />
         ),
       }),
@@ -303,6 +305,24 @@ export function UserTable({
       {meta && meta.totalPages > 0 && (
         <PaginationBar meta={meta} onPageChange={onPageChange} />
       )}
+
+      {/* Dialogo de confirmacion */}
+      <ConfirmDialog
+        isOpen={!!confirmUser}
+        title="Confirmar cambio de estado"
+        message={
+          confirmUser
+            ? `¿Deseas ${confirmUser.activo ? 'desactivar' : 'activar'} al usuario "${confirmUser.nombreCompleto}"?`
+            : ''
+        }
+        confirmLabel={confirmUser?.activo ? 'Desactivar' : 'Activar'}
+        variant={confirmUser?.activo ? 'danger' : 'warning'}
+        onConfirm={() => {
+          if (confirmUser) onToggleActivo(confirmUser);
+          setConfirmUser(null);
+        }}
+        onCancel={() => setConfirmUser(null)}
+      />
     </div>
   );
 }

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Eye, EyeOff, CheckCircle2 } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import { useRoles } from '@/hooks/useRoles';
 import { useUsers } from '@/hooks/useUsers';
 import type { User } from '@/types/user.types';
@@ -41,7 +41,7 @@ interface UserFormProps {
 
 export function UserForm({ initialValues, onSuccess, onCancel }: UserFormProps) {
   const { roles, isLoading: rolesLoading } = useRoles();
-  const { createUser, updateUser, success, reset } = useUsers();
+  const { createUser, updateUser } = useUsers();
   const [showPass, setShowPass] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const isEditing = !!initialValues;
@@ -101,7 +101,6 @@ export function UserForm({ initialValues, onSuccess, onCancel }: UserFormProps) 
 
   const handleLimpiar = () => {
     resetForm();
-    reset();
   };
 
   const inputClass =
@@ -111,14 +110,6 @@ export function UserForm({ initialValues, onSuccess, onCancel }: UserFormProps) 
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      {/* Banner de éxito */}
-      {success && !isEditing && (
-        <div className="flex items-center gap-2 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-sm">
-          <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
-          Usuario creado exitosamente
-        </div>
-      )}
-
       {/* Nombre completo */}
       <div>
         <label className={labelClass}>
