@@ -5,10 +5,10 @@ export interface LoginCredentials {
 
 export interface LoginResponse {
   access_token: string;
-  rol_id: number;
-}
-
-export interface SessionUser {
-  access_token: string;
-  rol_id: number;
+  user: {
+    id: number;
+    email: string;
+    nombreCompleto: string;
+    rol_id: number;
+  };
 }
