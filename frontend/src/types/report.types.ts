@@ -5,6 +5,15 @@ export interface ReportRole {
   rol: { rolDescripcion: string };
 }
 
+export interface ReportUserAccess {
+  usuarioId: number;
+  usuario?: {
+    id: number;
+    email: string;
+    nombreCompleto: string;
+  };
+}
+
 export interface Report {
   id: number;
   titulo: string;
@@ -14,6 +23,7 @@ export interface Report {
   fechaRegistro: string;
   padreId: number | null;
   reportesRoles: ReportRole[];
+  reportesUsuarios?: ReportUserAccess[];
   children?: Report[];
   padre?: { id: number; titulo: string } | null;
   _count?: { children: number };
@@ -25,6 +35,7 @@ export interface CreateReportPayload {
   urlIframe: string;
   descripcion?: string;
   rolesIds: number[];
+  usuariosIds?: number[];
   activo?: boolean;
   padreId?: number | null;
 }
@@ -34,6 +45,7 @@ export interface UpdateReportPayload {
   urlIframe?: string;
   descripcion?: string;
   rolesIds?: number[];
+  usuariosIds?: number[];
   activo?: boolean;
   padreId?: number | null;
 }

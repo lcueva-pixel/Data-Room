@@ -1,5 +1,6 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { LogService } from '../log/log.service';
 import { CreateReportDto } from './dto/create-report.dto';
 import { UpdateReportDto } from './dto/update-report.dto';
 import { ListReportsQueryDto } from './dto/list-reports-query.dto';
@@ -15,62 +16,66 @@ function toValidSortField(field?: string): ValidSortField {
   return 'id';
 }
 
-// Include para tabla admin — trae referencia al padre y conteo de hijos
+// Include para tabla admin — trae referencia al padre, conteo de hijos y usuarios con acceso
 const REPORT_INCLUDE_ADMIN = {
   reportesRoles: { include: { rol: true } },
+  reportesUsuarios: { include: { usuario: { select: { id: true, email: true, nombreCompleto: true } } } },
   padre: { select: { id: true, titulo: true } },
   _count: { select: { children: true } },
 } as const;
 
 @Injectable()
 export class ReportsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly logService: LogService,
+  ) {}
 
-  // ── Endpoint público (Sidebar) — solo raíces con children recursivos ──
-  async findByRole(rolId: number) {
-    const childrenInclude = {
-      reportesRoles: { include: { rol: true } },
-      children: {
-        where: { activo: true },
-        include: {
-          reportesRoles: { include: { rol: true } },
-          children: {
-            where: { activo: true },
-            include: { reportesRoles: { include: { rol: true } } },
-            orderBy: { id: 'asc' as const },
-          },
-        },
-        orderBy: { id: 'asc' as const },
-      },
-    };
+  // ── Endpoint público (Sidebar) — query plana + árbol en memoria (N niveles) ──
+  async findByRole(rolId: number, userId: number) {
+    const where: Record<string, unknown> = { activo: true };
 
-    if (rolId === 1) {
-      return this.prisma.report.findMany({
-        where: { activo: true, padreId: null },
-        include: childrenInclude,
-        orderBy: { id: 'asc' },
-      });
+    // Admin ve todo; otros filtran por rol O acceso individual
+    if (rolId !== 1) {
+      where.OR = [
+        { reportesRoles: { some: { rolId } } },
+        { reportesUsuarios: { some: { usuarioId: userId } } },
+      ];
     }
 
-    return this.prisma.report.findMany({
-      where: { activo: true, padreId: null, reportesRoles: { some: { rolId } } },
+    const allReports = await this.prisma.report.findMany({
+      where,
       include: {
         reportesRoles: { include: { rol: true } },
-        children: {
-          where: { activo: true, reportesRoles: { some: { rolId } } },
-          include: {
-            reportesRoles: { include: { rol: true } },
-            children: {
-              where: { activo: true, reportesRoles: { some: { rolId } } },
-              include: { reportesRoles: { include: { rol: true } } },
-              orderBy: { id: 'asc' as const },
-            },
-          },
-          orderBy: { id: 'asc' as const },
-        },
+        reportesUsuarios: { select: { usuarioId: true } },
       },
       orderBy: { id: 'asc' },
     });
+
+    return this.buildTree(allReports);
+  }
+
+  // ── Construir árbol jerárquico en memoria a partir de lista plana ──
+  private buildTree<T extends { id: number; padreId: number | null }>(
+    reports: T[],
+  ): (T & { children: T[] })[] {
+    const map = new Map<number, T & { children: T[] }>();
+    const roots: (T & { children: T[] })[] = [];
+
+    for (const r of reports) {
+      map.set(r.id, { ...r, children: [] });
+    }
+
+    for (const r of reports) {
+      const node = map.get(r.id)!;
+      if (r.padreId && map.has(r.padreId)) {
+        map.get(r.padreId)!.children.push(node);
+      } else {
+        roots.push(node);
+      }
+    }
+
+    return roots;
   }
 
   // ── Hijos directos de un reporte (modal de edición) ───────────────────
@@ -79,6 +84,7 @@ export class ReportsService {
       where: { padreId: parentId },
       include: {
         reportesRoles: { include: { rol: true } },
+        reportesUsuarios: { include: { usuario: { select: { id: true, email: true, nombreCompleto: true } } } },
         _count: { select: { children: true } },
       },
       orderBy: { id: 'asc' },
@@ -118,7 +124,7 @@ export class ReportsService {
   }
 
   // ── Crear reporte (con padreId opcional) ──────────────────────────────
-  async create(dto: CreateReportDto) {
+  async create(dto: CreateReportDto, executorId: number) {
     if (dto.padreId != null) {
       await this.prisma.report.findUniqueOrThrow({
         where: { id: dto.padreId },
@@ -135,13 +141,23 @@ export class ReportsService {
         reportesRoles: {
           create: dto.rolesIds.map((rolId) => ({ rolId })),
         },
+        ...(dto.usuariosIds?.length && {
+          reportesUsuarios: {
+            create: dto.usuariosIds.map((usuarioId) => ({ usuarioId })),
+          },
+        }),
       },
+    });
+    await this.logService.register({
+      usuarioId: executorId,
+      accion: 'CREAR_REPORTE',
+      detalle: `Reporte creado: ${dto.titulo}`,
     });
     return { message: 'Reporte creado exitosamente' };
   }
 
   // ── Actualizar reporte (con validación anti-circular) ─────────────────
-  async update(id: number, dto: UpdateReportDto) {
+  async update(id: number, dto: UpdateReportDto, executorId: number) {
     if (dto.padreId !== undefined) {
       if (dto.padreId === id) {
         throw new BadRequestException(
@@ -179,12 +195,23 @@ export class ReportsService {
             create: dto.rolesIds.map((rolId) => ({ rolId })),
           },
         }),
+        ...(dto.usuariosIds !== undefined && {
+          reportesUsuarios: {
+            deleteMany: {},
+            create: dto.usuariosIds.map((usuarioId) => ({ usuarioId })),
+          },
+        }),
       },
+    });
+    await this.logService.register({
+      usuarioId: executorId,
+      accion: 'ACTUALIZAR_REPORTE',
+      detalle: `Reporte actualizado: id=${id}`,
     });
     return { message: 'Reporte actualizado exitosamente' };
   }
 
-  async toggleActivo(id: number) {
+  async toggleActivo(id: number, executorId: number) {
     const report = await this.prisma.report.findUniqueOrThrow({
       where: { id },
     });
@@ -193,13 +220,23 @@ export class ReportsService {
       data: { activo: !report.activo },
       include: REPORT_INCLUDE_ADMIN,
     });
+    await this.logService.register({
+      usuarioId: executorId,
+      accion: 'TOGGLE_REPORTE',
+      detalle: `Reporte id=${id}: ${updated.activo ? 'activado' : 'desactivado'}`,
+    });
     return updated;
   }
 
-  async remove(id: number) {
+  async remove(id: number, executorId: number) {
     await this.prisma.report.update({
       where: { id },
       data: { activo: false },
+    });
+    await this.logService.register({
+      usuarioId: executorId,
+      accion: 'DESACTIVAR_REPORTE',
+      detalle: `Reporte desactivado: id=${id}`,
     });
     return { message: 'Reporte desactivado exitosamente' };
   }

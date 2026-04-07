@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import api from '@/lib/axios';
 import type {
   Report,
@@ -47,13 +48,27 @@ export function useAdminReports(initialQuery?: ReportListQuery) {
   const createMutation = useMutation({
     mutationFn: (payload: CreateReportPayload) =>
       api.post('/reports', payload).then((r) => r.data),
-    onSuccess: invalidate,
+    onSuccess: () => {
+      invalidate();
+      toast.success('Reporte creado exitosamente');
+    },
+    onError: (error: any) => {
+      const msg = error?.response?.data?.message;
+      toast.error(Array.isArray(msg) ? msg.join(', ') : msg ?? 'Error al crear reporte');
+    },
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, payload }: { id: number; payload: UpdateReportPayload }) =>
       api.put(`/reports/${id}`, payload).then((r) => r.data),
-    onSuccess: invalidate,
+    onSuccess: () => {
+      invalidate();
+      toast.success('Reporte actualizado exitosamente');
+    },
+    onError: (error: any) => {
+      const msg = error?.response?.data?.message;
+      toast.error(Array.isArray(msg) ? msg.join(', ') : msg ?? 'Error al actualizar reporte');
+    },
   });
 
   const toggleMutation = useMutation({
@@ -62,12 +77,22 @@ export function useAdminReports(initialQuery?: ReportListQuery) {
     onSuccess: () => {
       invalidate();
       window.dispatchEvent(new Event('refresh-reports'));
+      toast.success('Estado del reporte actualizado');
+    },
+    onError: () => {
+      toast.error('Error al cambiar estado del reporte');
     },
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id: number) => api.delete(`/reports/${id}`).then((r) => r.data),
-    onSuccess: invalidate,
+    onSuccess: () => {
+      invalidate();
+      toast.success('Reporte eliminado exitosamente');
+    },
+    onError: () => {
+      toast.error('Error al eliminar reporte');
+    },
   });
 
   return {

@@ -2,55 +2,47 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/context/AuthContext';
+import { useSession, signOut } from 'next-auth/react';
 import { useReports } from '@/hooks/useReports';
 import { Sidebar } from '@/components/dashboard/Sidebar';
 import { TopBar } from '@/components/dashboard/TopBar';
-import { getRolId } from '@/lib/auth';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const { logout } = useAuth();
+  const { data: session, status } = useSession();
+  const handleLogout = () => signOut({ callbackUrl: '/login' });
   const { reports, isLoading } = useReports();
-  const [mounted, setMounted] = useState(false);
-  const [rolId, setRolId] = useState<number | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-    setRolId(getRolId());
-  }, []);
+  const rolId = session?.user?.rol_id ?? null;
 
   // Guard client-side: redirigir si no es admin
   useEffect(() => {
-    if (mounted && rolId !== 1) {
+    if (status === 'authenticated' && rolId !== 1) {
       router.replace('/dashboard');
     }
-  }, [mounted, rolId, router]);
+  }, [status, rolId, router]);
 
-  if (!mounted) return null;
+  if (status === 'loading') return null;
   if (rolId !== 1) return null;
 
   return (
     <div className="flex h-screen overflow-hidden bg-slate-100 dark:bg-sidebar-main">
-      {/* Sidebar: en páginas admin, los reportes navegan al dashboard principal */}
       <Sidebar
         reports={reports}
         isLoading={isLoading}
         selectedReport={null}
         onReportSelect={() => router.push('/dashboard')}
-        onLogout={logout}
+        onLogout={handleLogout}
         rolId={rolId}
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
       />
 
-      {/* Área principal */}
       <div className="flex flex-col flex-1 overflow-hidden">
         <TopBar
           activeTitle="Administración"
           rolId={rolId}
-          onLogout={logout}
+          onLogout={handleLogout}
           onMenuToggle={() => setSidebarOpen((v) => !v)}
         />
 

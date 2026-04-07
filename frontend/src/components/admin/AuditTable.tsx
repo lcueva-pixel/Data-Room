@@ -84,7 +84,7 @@ function PaginationBar({
         <button
           onClick={() => onPageChange(page - 1)}
           disabled={page <= 1}
-          className="px-2 py-1 rounded hover:bg-slate-100 dark:hover:bg-sidebar-main disabled:opacity-40 disabled:cursor-not-allowed"
+          className="px-2 py-1 min-h-[44px] rounded hover:bg-slate-100 dark:hover:bg-sidebar-main disabled:opacity-40 disabled:cursor-not-allowed"
         >
           ←
         </button>
@@ -95,7 +95,7 @@ function PaginationBar({
             <button
               key={p}
               onClick={() => onPageChange(p as number)}
-              className={`px-2.5 py-1 rounded font-medium ${
+              className={`px-2.5 py-1 min-h-[44px] rounded font-medium ${
                 p === page
                   ? 'bg-sidebar-main text-white'
                   : 'hover:bg-slate-100 dark:hover:bg-sidebar-main'
@@ -108,7 +108,7 @@ function PaginationBar({
         <button
           onClick={() => onPageChange(page + 1)}
           disabled={page >= totalPages}
-          className="px-2 py-1 rounded hover:bg-slate-100 dark:hover:bg-sidebar-main disabled:opacity-40 disabled:cursor-not-allowed"
+          className="px-2 py-1 min-h-[44px] rounded hover:bg-slate-100 dark:hover:bg-sidebar-main disabled:opacity-40 disabled:cursor-not-allowed"
         >
           →
         </button>
@@ -169,72 +169,76 @@ export function AuditTable({
       </div>
 
       {/* Tabla */}
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="bg-slate-50 dark:bg-sidebar-main/60 border-b border-slate-200 dark:border-white/10">
-              <th className="text-left px-6 py-3 text-slate-500 dark:text-gray-400 font-medium">Tipo</th>
-              <th className="text-left px-6 py-3 text-slate-500 dark:text-gray-400 font-medium">Usuario</th>
-              <th className="text-left px-6 py-3 text-slate-500 dark:text-gray-400 font-medium">Correo</th>
-              <th className="text-left px-6 py-3 text-slate-500 dark:text-gray-400 font-medium">Fecha / Hora</th>
-              <th className="text-left px-6 py-3 text-slate-500 dark:text-gray-400 font-medium">Reporte</th>
-              <th className="text-left px-6 py-3 text-slate-500 dark:text-gray-400 font-medium">Duración</th>
-            </tr>
-          </thead>
-          <tbody>
-            {isLoading ? (
-              Array.from({ length: 5 }).map((_, i) => (
-                <tr key={i} className="border-b border-slate-100 dark:border-white/5">
-                  {Array.from({ length: 6 }).map((_, j) => (
-                    <td key={j} className="px-6 py-4">
-                      <div className="h-4 bg-slate-200 dark:bg-white/10 rounded animate-pulse" />
-                    </td>
-                  ))}
-                </tr>
-              ))
-            ) : entries.length === 0 ? (
-              <tr>
-                <td colSpan={6} className="px-6 py-8 text-center text-slate-400 dark:text-gray-500">
-                  No hay registros de auditoría
-                </td>
+      <div className="relative">
+        <div className="absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-white dark:from-sidebar-hover to-transparent pointer-events-none z-10 lg:hidden" />
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm min-w-[750px]">
+            <thead>
+              <tr className="bg-slate-50 dark:bg-sidebar-main/60 border-b border-slate-200 dark:border-white/10">
+                <th className="text-left px-6 py-3 text-slate-500 dark:text-gray-400 font-medium">Tipo</th>
+                <th className="text-left px-6 py-3 text-slate-500 dark:text-gray-400 font-medium">Usuario</th>
+                <th className="text-left px-6 py-3 text-slate-500 dark:text-gray-400 font-medium hidden md:table-cell">Correo</th>
+                <th className="text-left px-6 py-3 text-slate-500 dark:text-gray-400 font-medium">Fecha / Hora</th>
+                <th className="text-left px-6 py-3 text-slate-500 dark:text-gray-400 font-medium">Reporte</th>
+                <th className="text-left px-6 py-3 text-slate-500 dark:text-gray-400 font-medium hidden sm:table-cell">Duración</th>
               </tr>
-            ) : (
-              entries.map((entry) => (
-                <tr
-                  key={entry.id}
-                  className="border-b border-slate-100 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-sidebar-main/40 transition-colors"
-                >
-                  <td className="px-6 py-3">
-                    <TipoBadge tipo={entry.tipo} />
-                  </td>
-                  <td className="px-6 py-3 text-slate-800 dark:text-gray-100 font-medium">
-                    {entry.usuario?.nombreCompleto ?? '—'}
-                  </td>
-                  <td className="px-6 py-3 text-slate-600 dark:text-gray-300">
-                    {entry.usuario?.email ?? '—'}
-                  </td>
-                  <td className="px-6 py-3 text-slate-600 dark:text-gray-300">
-                    {fmt.format(new Date(entry.fechaHora))}
-                  </td>
-                  <td className="px-6 py-3 text-slate-600 dark:text-gray-300">
-                    {entry.reporte?.titulo ?? (
-                      <span className="text-slate-300 dark:text-gray-600">—</span>
-                    )}
-                  </td>
-                  <td className="px-6 py-3">
-                    {entry.duracion != null ? (
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-sidebar-accent/20 text-[#0d3640] dark:text-sidebar-accent">
-                        {formatDuration(entry.duracion)}
-                      </span>
-                    ) : (
-                      <span className="text-slate-300 dark:text-gray-600">—</span>
-                    )}
+            </thead>
+            <tbody>
+              {isLoading ? (
+                Array.from({ length: 5 }).map((_, i) => (
+                  <tr key={i} className="border-b border-slate-100 dark:border-white/5">
+                    <td className="px-6 py-4"><div className="h-4 bg-slate-200 dark:bg-white/10 rounded animate-pulse" /></td>
+                    <td className="px-6 py-4"><div className="h-4 bg-slate-200 dark:bg-white/10 rounded animate-pulse" /></td>
+                    <td className="px-6 py-4 hidden md:table-cell"><div className="h-4 bg-slate-200 dark:bg-white/10 rounded animate-pulse" /></td>
+                    <td className="px-6 py-4"><div className="h-4 bg-slate-200 dark:bg-white/10 rounded animate-pulse" /></td>
+                    <td className="px-6 py-4"><div className="h-4 bg-slate-200 dark:bg-white/10 rounded animate-pulse" /></td>
+                    <td className="px-6 py-4 hidden sm:table-cell"><div className="h-4 bg-slate-200 dark:bg-white/10 rounded animate-pulse" /></td>
+                  </tr>
+                ))
+              ) : entries.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-6 py-8 text-center text-slate-400 dark:text-gray-500">
+                    No hay registros de auditoría
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : (
+                entries.map((entry) => (
+                  <tr
+                    key={entry.id}
+                    className="border-b border-slate-100 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-sidebar-main/40 transition-colors"
+                  >
+                    <td className="px-6 py-3">
+                      <TipoBadge tipo={entry.tipo} />
+                    </td>
+                    <td className="px-6 py-3 text-slate-800 dark:text-gray-100 font-medium">
+                      {entry.usuario?.nombreCompleto ?? '—'}
+                    </td>
+                    <td className="px-6 py-3 text-slate-600 dark:text-gray-300 hidden md:table-cell">
+                      {entry.usuario?.email ?? '—'}
+                    </td>
+                    <td className="px-6 py-3 text-slate-600 dark:text-gray-300">
+                      {fmt.format(new Date(entry.fechaHora))}
+                    </td>
+                    <td className="px-6 py-3 text-slate-600 dark:text-gray-300">
+                      {entry.reporte?.titulo ?? (
+                        <span className="text-slate-300 dark:text-gray-600">—</span>
+                      )}
+                    </td>
+                    <td className="px-6 py-3 hidden sm:table-cell">
+                      {entry.duracion != null ? (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-sidebar-accent/20 text-[#0d3640] dark:text-sidebar-accent">
+                          {formatDuration(entry.duracion)}
+                        </span>
+                      ) : (
+                        <span className="text-slate-300 dark:text-gray-600">—</span>
+                      )}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* Paginación */}

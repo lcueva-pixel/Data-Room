@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Patch, Body, Param, Query, ParseIntPipe, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Patch, Body, Param, Query, Req, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -11,31 +11,37 @@ import { AdminGuard } from '../auth/admin.guard';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @Get('search')
+  async searchByEmail(@Query('email') email: string) {
+    return this.usersService.searchByEmail(email);
+  }
+
   @Get()
   async findAll(@Query() query: ListUsersQueryDto) {
     return this.usersService.findAll(query);
   }
 
   @Post()
-  async create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  async create(@Body() createUserDto: CreateUserDto, @Req() req: any) {
+    return this.usersService.create(createUserDto, req.user.userId);
   }
 
   @Put(':id')
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateUserDto: UpdateUserDto,
+    @Req() req: any,
   ) {
-    return this.usersService.update(id, updateUserDto);
+    return this.usersService.update(id, updateUserDto, req.user.userId);
   }
 
   @Patch(':id/toggle')
-  async toggleActivo(@Param('id', ParseIntPipe) id: number) {
-    return this.usersService.toggleActivo(id);
+  async toggleActivo(@Param('id', ParseIntPipe) id: number, @Req() req: any) {
+    return this.usersService.toggleActivo(id, req.user.userId);
   }
 
   @Delete(':id')
-  async remove(@Param('id', ParseIntPipe) id: number) {
-    return this.usersService.remove(id);
+  async remove(@Param('id', ParseIntPipe) id: number, @Req() req: any) {
+    return this.usersService.remove(id, req.user.userId);
   }
 }

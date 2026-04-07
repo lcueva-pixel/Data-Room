@@ -16,13 +16,12 @@ import {
   ShieldCheck,
   Globe,
 } from 'lucide-react';
-import { useAuth } from '@/context/AuthContext';
+import { useSession, signOut } from 'next-auth/react';
 import { useReports } from '@/hooks/useReports';
 import { Sidebar } from '@/components/dashboard/Sidebar';
 import { TopBar } from '@/components/dashboard/TopBar';
 import { OverviewCard } from '@/components/overview/OverviewCard';
 import { PDFViewerModal } from '@/components/overview/PDFViewerModal';
-import { getRolId } from '@/lib/auth';
 
 interface SelectedDocument {
   title: string;
@@ -78,9 +77,10 @@ const OVERVIEW_CARDS = [
 
 export default function OverviewPage() {
   const router = useRouter();
-  const { logout } = useAuth();
+  const { data: session } = useSession();
+  const handleLogout = () => signOut({ callbackUrl: '/login' });
   const { reports, isLoading } = useReports();
-  const rolId = getRolId();
+  const rolId = session?.user?.rol_id ?? null;
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -104,7 +104,7 @@ export default function OverviewPage() {
         isLoading={isLoading}
         selectedReport={null}
         onReportSelect={() => router.push('/dashboard')}
-        onLogout={logout}
+        onLogout={handleLogout}
         rolId={rolId}
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
@@ -112,7 +112,7 @@ export default function OverviewPage() {
 
       {/* Área principal */}
       <div className="flex flex-col flex-1 overflow-hidden">
-        <TopBar activeTitle="Overview" rolId={rolId} onLogout={logout} onMenuToggle={() => setSidebarOpen((v) => !v)} />
+        <TopBar activeTitle="Overview" rolId={rolId} onLogout={handleLogout} onMenuToggle={() => setSidebarOpen((v) => !v)} />
 
         <main className="flex-1 overflow-y-auto p-6">
           {/* Breadcrumb de página */}

@@ -1,4 +1,4 @@
-import { IsString, IsBoolean, IsOptional, IsArray, IsInt } from 'class-validator';
+import { IsString, IsBoolean, IsOptional, IsArray, IsInt, Matches } from 'class-validator';
 
 export class UpdateReportDto {
   @IsString()
@@ -6,6 +6,9 @@ export class UpdateReportDto {
   titulo?: string;
 
   @IsString()
+  @Matches(/^https:\/\//, {
+    message: 'La URL del iframe debe comenzar con https://',
+  })
   @IsOptional()
   urlIframe?: string;
 
@@ -17,6 +20,11 @@ export class UpdateReportDto {
   @IsInt({ each: true })
   @IsOptional()
   rolesIds?: number[];
+
+  @IsArray()
+  @IsInt({ each: true })
+  @IsOptional()
+  usuariosIds?: number[];
 
   @IsBoolean()
   @IsOptional()

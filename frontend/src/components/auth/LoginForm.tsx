@@ -1,11 +1,12 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 import { Eye, EyeOff, LogIn } from 'lucide-react';
-import { useAuth } from '@/context/AuthContext';
 
 export function LoginForm() {
-  const { login } = useAuth();
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -20,15 +21,19 @@ export function LoginForm() {
     setError(null);
 
     try {
-      await login({ email, password });
-    } catch (err: unknown) {
-      const axiosError = err as { response?: { data?: { message?: string } } };
-      const msg = axiosError?.response?.data?.message;
-      setError(
-        typeof msg === 'string'
-          ? msg
-          : 'Credenciales incorrectas. Intenta de nuevo.',
-      );
+      const result = await signIn('credentials', {
+        email,
+        password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        setError('Credenciales incorrectas. Intenta de nuevo.');
+      } else {
+        router.push('/dashboard/overview');
+      }
+    } catch {
+      setError('Error de conexion. Intenta de nuevo.');
     } finally {
       setIsLoading(false);
     }

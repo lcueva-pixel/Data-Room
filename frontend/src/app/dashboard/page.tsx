@@ -2,26 +2,25 @@
 
 import { useState, useEffect } from 'react';
 import { LayoutDashboard } from 'lucide-react';
-import { useAuth } from '@/context/AuthContext';
+import { useSession, signOut } from 'next-auth/react';
 import { useReports } from '@/hooks/useReports';
 import { Sidebar } from '@/components/dashboard/Sidebar';
 import { TopBar } from '@/components/dashboard/TopBar';
 import { ReportViewer } from '@/components/dashboard/ReportViewer';
-import { getRolId } from '@/lib/auth';
 import type { Report } from '@/types/report.types';
 
 
 export default function DashboardPage() {
-  const { logout } = useAuth();
+  const { data: session, status } = useSession();
+  const handleLogout = () => signOut({ callbackUrl: '/login' });
   const { reports, isLoading, error } = useReports();
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
   const [mounted, setMounted] = useState(false);
-  const [rolId, setRolId] = useState<number | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const rolId = session?.user?.rol_id ?? null;
 
   useEffect(() => {
     setMounted(true);
-    setRolId(getRolId());
   }, []);
 
 
@@ -32,7 +31,7 @@ export default function DashboardPage() {
     }
   }, [reports, selectedReport]);
 
-  if (!mounted) return null;
+  if (!mounted || status === 'loading') return null;
 
   const activeTitle = selectedReport?.titulo ?? 'Panel de Reportes';
 
@@ -44,7 +43,7 @@ export default function DashboardPage() {
         isLoading={isLoading}
         selectedReport={selectedReport}
         onReportSelect={setSelectedReport}
-        onLogout={logout}
+        onLogout={handleLogout}
         rolId={rolId}
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
@@ -56,7 +55,7 @@ export default function DashboardPage() {
         <TopBar
           activeTitle={activeTitle}
           rolId={rolId}
-          onLogout={logout}
+          onLogout={handleLogout}
           onMenuToggle={() => setSidebarOpen((v) => !v)}
         />
 

@@ -13,7 +13,7 @@ export class ReportsController {
 
   @Get()
   async findAll(@Req() req: any) {
-    return this.reportsService.findByRole(req.user.rol_id);
+    return this.reportsService.findByRole(req.user.rol_id, req.user.userId);
   }
 
   @Get('admin')
@@ -30,8 +30,8 @@ export class ReportsController {
 
   @Post()
   @UseGuards(AdminGuard)
-  async create(@Body() createReportDto: CreateReportDto) {
-    return this.reportsService.create(createReportDto);
+  async create(@Body() createReportDto: CreateReportDto, @Req() req: any) {
+    return this.reportsService.create(createReportDto, req.user.userId);
   }
 
   @Put(':id')
@@ -39,19 +39,20 @@ export class ReportsController {
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateReportDto: UpdateReportDto,
+    @Req() req: any,
   ) {
-    return this.reportsService.update(id, updateReportDto);
+    return this.reportsService.update(id, updateReportDto, req.user.userId);
   }
 
   @Patch(':id/toggle')
   @UseGuards(AdminGuard)
-  async toggleActivo(@Param('id', ParseIntPipe) id: number) {
-    return this.reportsService.toggleActivo(id);
+  async toggleActivo(@Param('id', ParseIntPipe) id: number, @Req() req: any) {
+    return this.reportsService.toggleActivo(id, req.user.userId);
   }
 
   @Delete(':id')
   @UseGuards(AdminGuard)
-  async remove(@Param('id', ParseIntPipe) id: number) {
-    return this.reportsService.remove(id);
+  async remove(@Param('id', ParseIntPipe) id: number, @Req() req: any) {
+    return this.reportsService.remove(id, req.user.userId);
   }
 }

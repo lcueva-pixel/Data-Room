@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getToken, clearSession } from './auth';
+import { getSession } from 'next-auth/react';
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -8,10 +8,10 @@ const api = axios.create({
   },
 });
 
-api.interceptors.request.use((config) => {
-  const token = getToken();
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+api.interceptors.request.use(async (config) => {
+  const session = await getSession();
+  if ((session as any)?.backendToken) {
+    config.headers.Authorization = `Bearer ${(session as any).backendToken}`;
   }
   return config;
 });
@@ -20,7 +20,6 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      clearSession();
       if (typeof window !== 'undefined') {
         window.location.href = '/login';
       }

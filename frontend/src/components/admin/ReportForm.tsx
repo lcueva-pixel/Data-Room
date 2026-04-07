@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { useRoles } from '@/hooks/useRoles';
 import { useAdminReports } from '@/hooks/useAdminReports';
 import { ChildReportsSection } from '@/components/admin/ChildReportsSection';
+import { UserAccessSelector } from '@/components/admin/UserAccessSelector';
 import type { Report } from '@/types/report.types';
 
 const reportSchema = z.object({
@@ -16,6 +17,7 @@ const reportSchema = z.object({
     .startsWith('https://', 'La URL debe comenzar con https://'),
   descripcion: z.string().max(500).optional(),
   rolesIds: z.array(z.number().int()).min(1, 'Selecciona al menos un rol'),
+  usuariosIds: z.array(z.number().int()),
   activo: z.boolean(),
 });
 
@@ -37,6 +39,8 @@ export function ReportForm({ onSuccess, onCancel, initialValues, lockedParentId 
     register,
     handleSubmit,
     control,
+    watch,
+    setValue,
     formState: { errors, isSubmitting },
     setError,
   } = useForm<ReportFormValues>({
@@ -47,9 +51,10 @@ export function ReportForm({ onSuccess, onCancel, initialValues, lockedParentId 
           urlIframe: initialValues.urlIframe,
           descripcion: initialValues.descripcion ?? '',
           rolesIds: initialValues.reportesRoles.map((r) => r.rolId),
+          usuariosIds: initialValues.reportesUsuarios?.map((ru) => ru.usuarioId) ?? [],
           activo: initialValues.activo,
         }
-      : { activo: true, rolesIds: [] as number[] },
+      : { activo: true, rolesIds: [] as number[], usuariosIds: [] as number[] },
   });
 
   const onSubmit = async (data: ReportFormValues) => {
@@ -155,6 +160,13 @@ export function ReportForm({ onSuccess, onCancel, initialValues, lockedParentId 
         )}
         {errors.rolesIds && <p className={errorClass}>{errors.rolesIds.message}</p>}
       </div>
+
+      {/* Acceso especial por usuario */}
+      <UserAccessSelector
+        value={watch('usuariosIds')}
+        onChange={(ids) => setValue('usuariosIds', ids)}
+        existingUsers={initialValues?.reportesUsuarios ?? []}
+      />
 
       {/* Activo */}
       <div className="flex items-center gap-2">
