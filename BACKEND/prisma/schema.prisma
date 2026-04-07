@@ -78,13 +78,16 @@ model AuditAccess {
 
 model LogActivity {
   id        Int      @id @default(autoincrement())
-  usuarioId Int      @map("usuario_id")
+  usuarioId Int?     @map("usuario_id")
   accion    String   @db.VarChar(100)
   detalle   String?
+  nivel     String   @default("INFO") @db.VarChar(20)
   fechaHora DateTime @default(now()) @map("fecha_hora") @db.Timestamptz
 
-  usuario User @relation(fields: [usuarioId], references: [id])
+  usuario User? @relation(fields: [usuarioId], references: [id])
 
+  @@index([fechaHora])
+  @@index([nivel])
   @@map("cex_log_actividades")
 }
 
