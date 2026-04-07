@@ -16,9 +16,10 @@ function toValidSortField(field?: string): ValidSortField {
   return 'id';
 }
 
-// Include para tabla admin — trae referencia al padre y conteo de hijos
+// Include para tabla admin — trae referencia al padre, conteo de hijos y usuarios con acceso
 const REPORT_INCLUDE_ADMIN = {
   reportesRoles: { include: { rol: true } },
+  reportesUsuarios: { include: { usuario: { select: { id: true, email: true, nombreCompleto: true } } } },
   padre: { select: { id: true, titulo: true } },
   _count: { select: { children: true } },
 } as const;
@@ -30,51 +31,51 @@ export class ReportsService {
     private readonly logService: LogService,
   ) {}
 
-  // ── Endpoint público (Sidebar) — solo raíces con children recursivos ──
-  async findByRole(rolId: number) {
-    const childrenInclude = {
-      reportesRoles: { include: { rol: true } },
-      children: {
-        where: { activo: true },
-        include: {
-          reportesRoles: { include: { rol: true } },
-          children: {
-            where: { activo: true },
-            include: { reportesRoles: { include: { rol: true } } },
-            orderBy: { id: 'asc' as const },
-          },
-        },
-        orderBy: { id: 'asc' as const },
-      },
-    };
+  // ── Endpoint público (Sidebar) — query plana + árbol en memoria (N niveles) ──
+  async findByRole(rolId: number, userId: number) {
+    const where: Record<string, unknown> = { activo: true };
 
-    if (rolId === 1) {
-      return this.prisma.report.findMany({
-        where: { activo: true, padreId: null },
-        include: childrenInclude,
-        orderBy: { id: 'asc' },
-      });
+    // Admin ve todo; otros filtran por rol O acceso individual
+    if (rolId !== 1) {
+      where.OR = [
+        { reportesRoles: { some: { rolId } } },
+        { reportesUsuarios: { some: { usuarioId: userId } } },
+      ];
     }
 
-    return this.prisma.report.findMany({
-      where: { activo: true, padreId: null, reportesRoles: { some: { rolId } } },
+    const allReports = await this.prisma.report.findMany({
+      where,
       include: {
         reportesRoles: { include: { rol: true } },
-        children: {
-          where: { activo: true, reportesRoles: { some: { rolId } } },
-          include: {
-            reportesRoles: { include: { rol: true } },
-            children: {
-              where: { activo: true, reportesRoles: { some: { rolId } } },
-              include: { reportesRoles: { include: { rol: true } } },
-              orderBy: { id: 'asc' as const },
-            },
-          },
-          orderBy: { id: 'asc' as const },
-        },
+        reportesUsuarios: { select: { usuarioId: true } },
       },
       orderBy: { id: 'asc' },
     });
+
+    return this.buildTree(allReports);
+  }
+
+  // ── Construir árbol jerárquico en memoria a partir de lista plana ──
+  private buildTree<T extends { id: number; padreId: number | null }>(
+    reports: T[],
+  ): (T & { children: T[] })[] {
+    const map = new Map<number, T & { children: T[] }>();
+    const roots: (T & { children: T[] })[] = [];
+
+    for (const r of reports) {
+      map.set(r.id, { ...r, children: [] });
+    }
+
+    for (const r of reports) {
+      const node = map.get(r.id)!;
+      if (r.padreId && map.has(r.padreId)) {
+        map.get(r.padreId)!.children.push(node);
+      } else {
+        roots.push(node);
+      }
+    }
+
+    return roots;
   }
 
   // ── Hijos directos de un reporte (modal de edición) ───────────────────
@@ -83,6 +84,7 @@ export class ReportsService {
       where: { padreId: parentId },
       include: {
         reportesRoles: { include: { rol: true } },
+        reportesUsuarios: { include: { usuario: { select: { id: true, email: true, nombreCompleto: true } } } },
         _count: { select: { children: true } },
       },
       orderBy: { id: 'asc' },
@@ -139,6 +141,11 @@ export class ReportsService {
         reportesRoles: {
           create: dto.rolesIds.map((rolId) => ({ rolId })),
         },
+        ...(dto.usuariosIds?.length && {
+          reportesUsuarios: {
+            create: dto.usuariosIds.map((usuarioId) => ({ usuarioId })),
+          },
+        }),
       },
     });
     await this.logService.register({
@@ -186,6 +193,12 @@ export class ReportsService {
           reportesRoles: {
             deleteMany: {},
             create: dto.rolesIds.map((rolId) => ({ rolId })),
+          },
+        }),
+        ...(dto.usuariosIds !== undefined && {
+          reportesUsuarios: {
+            deleteMany: {},
+            create: dto.usuariosIds.map((usuarioId) => ({ usuarioId })),
           },
         }),
       },

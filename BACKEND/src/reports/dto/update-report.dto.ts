@@ -21,6 +21,11 @@ export class UpdateReportDto {
   @IsOptional()
   rolesIds?: number[];
 
+  @IsArray()
+  @IsInt({ each: true })
+  @IsOptional()
+  usuariosIds?: number[];
+
   @IsBoolean()
   @IsOptional()
   activo?: boolean;

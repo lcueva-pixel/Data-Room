@@ -11,6 +11,11 @@ import { AdminGuard } from '../auth/admin.guard';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @Get('search')
+  async searchByEmail(@Query('email') email: string) {
+    return this.usersService.searchByEmail(email);
+  }
+
   @Get()
   async findAll(@Query() query: ListUsersQueryDto) {
     return this.usersService.findAll(query);

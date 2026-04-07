@@ -5,6 +5,22 @@ export const authConfig: NextAuthConfig = {
     signIn: '/login',
   },
   callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.rol_id = Number(user.rol_id);
+        token.backendToken = user.backendToken;
+        token.userId = user.id;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (session.user) {
+        session.user.rol_id = Number(token.rol_id);
+        session.user.id = token.userId as string;
+      }
+      (session as any).backendToken = token.backendToken;
+      return session;
+    },
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;
       const isOnDashboard = nextUrl.pathname.startsWith('/dashboard');
@@ -13,7 +29,7 @@ export const authConfig: NextAuthConfig = {
 
       if (isOnDashboard) {
         if (!isLoggedIn) return false;
-        if (isAdminRoute && (auth?.user as any)?.rol_id !== 1) {
+        if (isAdminRoute && Number(auth?.user?.rol_id) !== 1) {
           return Response.redirect(new URL('/dashboard', nextUrl));
         }
         return true;
@@ -25,6 +41,9 @@ export const authConfig: NextAuthConfig = {
 
       return true;
     },
+  },
+  session: {
+    strategy: 'jwt',
   },
   providers: [],
 };
