@@ -11,7 +11,7 @@ import type { Report } from '@/types/report.types';
 
 
 export default function DashboardPage() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const handleLogout = () => signOut({ callbackUrl: '/login' });
   const { reports, isLoading, error } = useReports();
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
@@ -31,7 +31,7 @@ export default function DashboardPage() {
     }
   }, [reports, selectedReport]);
 
-  if (!mounted) return null;
+  if (!mounted || status === 'loading') return null;
 
   const activeTitle = selectedReport?.titulo ?? 'Panel de Reportes';
 

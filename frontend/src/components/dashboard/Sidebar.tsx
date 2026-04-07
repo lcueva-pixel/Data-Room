@@ -70,9 +70,9 @@ function SidebarReportItem({
       <button
         onClick={() => onSelect(report)}
         className={clsx(NAV_BASE, 'w-full text-left', isActive ? NAV_ACTIVE : NAV_INACTIVE)}
-        style={{ paddingLeft: `${12 + depth * 16}px` }}
+        style={{ paddingLeft: `${12 + Math.min(depth, 5) * 16}px` }}
       >
-        <BarChart2 className={clsx('flex-shrink-0', depth > 0 ? 'w-3.5 h-3.5' : 'w-4 h-4')} />
+        <BarChart2 className={clsx('flex-shrink-0', depth === 0 ? 'w-4 h-4' : depth <= 2 ? 'w-3.5 h-3.5' : 'w-3 h-3')} />
         <span className="truncate flex-1">{report.titulo}</span>
         {hasChildren && (
           <ChevronDown
@@ -208,12 +208,12 @@ export function Sidebar({
             )}
           >
             <LayoutDashboard className="w-4 h-4 flex-shrink-0" />
-            <span>Overview</span>
+            <span>VDR Guide</span>
           </Link>
 
           {/* Sección: Reportes */}
           <p className="text-gray-500 text-xs font-semibold uppercase tracking-widest px-2 mb-3">
-            Reportes
+            Contents
           </p>
 
           {isLoading ? (

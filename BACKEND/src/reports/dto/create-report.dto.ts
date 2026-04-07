@@ -19,6 +19,11 @@ export class CreateReportDto {
   @ArrayMinSize(1, { message: 'Selecciona al menos un rol' })
   rolesIds: number[];
 
+  @IsArray()
+  @IsInt({ each: true })
+  @IsOptional()
+  usuariosIds?: number[];
+
   @IsBoolean()
   @IsOptional()
   activo?: boolean;

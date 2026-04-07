@@ -13,7 +13,7 @@ export class ReportsController {
 
   @Get()
   async findAll(@Req() req: any) {
-    return this.reportsService.findByRole(req.user.rol_id);
+    return this.reportsService.findByRole(req.user.rol_id, req.user.userId);
   }
 
   @Get('admin')

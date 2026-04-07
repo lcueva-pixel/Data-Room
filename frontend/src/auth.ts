@@ -43,25 +43,4 @@ export const {
       },
     }),
   ],
-  callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.rol_id = (user as any).rol_id;
-        token.backendToken = (user as any).backendToken;
-        token.userId = user.id;
-      }
-      return token;
-    },
-    async session({ session, token }) {
-      if (session.user) {
-        (session.user as any).rol_id = token.rol_id;
-        (session.user as any).id = token.userId;
-      }
-      (session as any).backendToken = token.backendToken;
-      return session;
-    },
-  },
-  session: {
-    strategy: 'jwt',
-  },
 });

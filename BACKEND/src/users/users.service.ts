@@ -24,6 +24,17 @@ export class UsersService {
     private readonly logService: LogService,
   ) {}
 
+  async searchByEmail(email: string) {
+    return this.prisma.user.findMany({
+      where: {
+        email: { contains: email, mode: 'insensitive' },
+        activo: true,
+      },
+      select: { id: true, email: true, nombreCompleto: true },
+      take: 10,
+    });
+  }
+
   async findAll(query: ListUsersQueryDto) {
     const page = query.page ?? 1;
     const limit = query.limit ?? 10;

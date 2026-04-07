@@ -31,6 +31,7 @@ model User {
   auditAccesses   AuditAccess[]
   logActivities   LogActivity[]
   reportViewLogs  ReportViewLog[]
+  reportesAcceso  ReportUserAccess[]
 
   @@map("cex_usuarios")
 }
@@ -48,8 +49,9 @@ model Report {
   padre    Report?  @relation("ReportHierarchy", fields: [padreId], references: [id], onDelete: SetNull)
   children Report[] @relation("ReportHierarchy")
 
-  reportesRoles  ReportRole[]
-  reportViewLogs ReportViewLog[]
+  reportesRoles    ReportRole[]
+  reportesUsuarios ReportUserAccess[]
+  reportViewLogs   ReportViewLog[]
 
   @@map("cex_reportes")
 }
@@ -63,6 +65,17 @@ model ReportRole {
 
   @@id([reporteId, rolId])
   @@map("cex_reportes_roles")
+}
+
+model ReportUserAccess {
+  reporteId Int @map("reporte_id")
+  usuarioId Int @map("usuario_id")
+
+  reporte Report @relation(fields: [reporteId], references: [id], onDelete: Cascade)
+  usuario User   @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@id([reporteId, usuarioId])
+  @@map("cex_reportes_usuarios")
 }
 
 model AuditAccess {
