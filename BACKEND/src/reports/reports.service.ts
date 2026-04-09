@@ -78,6 +78,35 @@ export class ReportsService {
     return roots;
   }
 
+  // ── Obtener IDs de todos los descendientes (cascada) ───────────────────
+  private async getDescendantIds(reportId: number): Promise<number[]> {
+    const allReports = await this.prisma.report.findMany({
+      select: { id: true, padreId: true },
+    });
+
+    // Construir mapa padreId -> [hijoId, ...]
+    const childrenMap = new Map<number, number[]>();
+    for (const r of allReports) {
+      if (r.padreId !== null) {
+        const siblings = childrenMap.get(r.padreId) ?? [];
+        siblings.push(r.id);
+        childrenMap.set(r.padreId, siblings);
+      }
+    }
+
+    // BFS desde reportId
+    const descendants: number[] = [];
+    const queue = childrenMap.get(reportId) ?? [];
+    while (queue.length > 0) {
+      const current = queue.shift()!;
+      descendants.push(current);
+      const children = childrenMap.get(current);
+      if (children) queue.push(...children);
+    }
+
+    return descendants;
+  }
+
   // ── Hijos directos de un reporte (modal de edición) ───────────────────
   async findChildren(parentId: number) {
     return this.prisma.report.findMany({
@@ -215,9 +244,27 @@ export class ReportsService {
     const report = await this.prisma.report.findUniqueOrThrow({
       where: { id },
     });
+    const nuevoEstado = !report.activo;
+
+    // Cascada: al desactivar, desactivar todos los descendientes
+    if (!nuevoEstado) {
+      const descendantIds = await this.getDescendantIds(id);
+      if (descendantIds.length > 0) {
+        await this.prisma.report.updateMany({
+          where: { id: { in: descendantIds } },
+          data: { activo: false },
+        });
+        await this.logService.register({
+          usuarioId: executorId,
+          accion: 'CASCADA_DESACTIVAR',
+          detalle: `Desactivados en cascada: ${descendantIds.length} descendientes del reporte id=${id}`,
+        });
+      }
+    }
+
     const updated = await this.prisma.report.update({
       where: { id },
-      data: { activo: !report.activo },
+      data: { activo: nuevoEstado },
       include: REPORT_INCLUDE_ADMIN,
     });
     await this.logService.register({
@@ -229,14 +276,18 @@ export class ReportsService {
   }
 
   async remove(id: number, executorId: number) {
-    await this.prisma.report.update({
-      where: { id },
+    const descendantIds = await this.getDescendantIds(id);
+    const allIds = [id, ...descendantIds];
+
+    await this.prisma.report.updateMany({
+      where: { id: { in: allIds } },
       data: { activo: false },
     });
+
     await this.logService.register({
       usuarioId: executorId,
       accion: 'DESACTIVAR_REPORTE',
-      detalle: `Reporte desactivado: id=${id}`,
+      detalle: `Reporte id=${id} desactivado con ${descendantIds.length} descendientes`,
     });
     return { message: 'Reporte desactivado exitosamente' };
   }
