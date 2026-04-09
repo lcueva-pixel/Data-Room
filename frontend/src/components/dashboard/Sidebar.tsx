@@ -54,10 +54,17 @@ function SidebarReportItem({
   setExpanded: (id: number, open: boolean) => void;
   depth?: number;
 }) {
-  const hasChildren = report.children && report.children.length > 0;
+  const activeChildren = report.children?.filter((c) => c.activo !== false) ?? [];
+  const hasChildren = activeChildren.length > 0;
   const isExpanded = expandedIds.has(report.id);
   const isActive = selectedReport?.id === report.id;
   const childSelected = hasSelectedChild(report, selectedReport?.id);
+
+  // Padding degresivo: el incremento se reduce en niveles profundos
+  const paddingLeft = depth === 0 ? 12
+    : depth === 1 ? 22
+    : depth === 2 ? 30
+    : 12 + 24 + Math.min(depth - 3, 2) * 4;
 
   return (
     <div
@@ -69,8 +76,9 @@ function SidebarReportItem({
     >
       <button
         onClick={() => onSelect(report)}
+        title={report.titulo}
         className={clsx(NAV_BASE, 'w-full text-left', isActive ? NAV_ACTIVE : NAV_INACTIVE)}
-        style={{ paddingLeft: `${12 + Math.min(depth, 5) * 16}px` }}
+        style={{ paddingLeft: `${paddingLeft}px` }}
       >
         <BarChart2 className={clsx('flex-shrink-0', depth === 0 ? 'w-4 h-4' : depth <= 2 ? 'w-3.5 h-3.5' : 'w-3 h-3')} />
         <span className="truncate flex-1">{report.titulo}</span>
@@ -85,8 +93,8 @@ function SidebarReportItem({
       </button>
 
       {hasChildren && isExpanded && (
-        <div className="border-l border-white/10 ml-5">
-          {report.children!.map((child) => (
+        <div className="border-l border-white/10 ml-3">
+          {activeChildren.map((child) => (
             <SidebarReportItem
               key={child.id}
               report={child}
@@ -229,7 +237,7 @@ export function Sidebar({
           ) : reports.length === 0 ? (
             <p className="text-gray-500 text-xs px-2 py-3">Sin reportes disponibles</p>
           ) : (
-            reports.map((report) => (
+            reports.filter((r) => r.activo !== false).map((report) => (
               <SidebarReportItem
                 key={report.id}
                 report={report}
