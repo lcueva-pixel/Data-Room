@@ -7,12 +7,32 @@ import { useReportTracking } from '@/hooks/useReportTracking';
 interface ReportViewerProps {
   reportId: number;
   titulo: string;
-  urlIframe: string;
+  urlIframe: string | null;
 }
 
 export function ReportViewer({ reportId, titulo, urlIframe }: ReportViewerProps) {
   useReportTracking(reportId);
   const [isLoaded, setIsLoaded] = useState(false);
+
+  if (!urlIframe) {
+    return (
+      <div className="flex flex-col h-full">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-lg font-semibold text-slate-700 truncate">{titulo}</h2>
+        </div>
+        <div className="flex-1 rounded-xl border border-dashed border-slate-300 bg-white flex items-center justify-center">
+          <div className="text-center px-6">
+            <p className="text-sm text-slate-500">
+              Este reporte no tiene gráfico configurado.
+            </p>
+            <p className="text-xs text-slate-400 mt-1">
+              Si es un reporte principal, agrégale sub-reportes para verlos como dashboard.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-full">

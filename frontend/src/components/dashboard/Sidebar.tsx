@@ -12,6 +12,7 @@ interface SidebarProps {
   reports: Report[];
   isLoading: boolean;
   selectedReport: Report | null;
+  highlightedChildId?: number | null;
   onReportSelect: (report: Report) => void;
   onLogout: () => void;
   rolId: number | null;
@@ -42,6 +43,7 @@ function hasSelectedChild(report: Report, selectedId: number | undefined): boole
 function SidebarReportItem({
   report,
   selectedReport,
+  highlightedChildId,
   onSelect,
   expandedIds,
   setExpanded,
@@ -49,6 +51,7 @@ function SidebarReportItem({
 }: {
   report: Report;
   selectedReport: Report | null;
+  highlightedChildId?: number | null;
   onSelect: (r: Report) => void;
   expandedIds: Set<number>;
   setExpanded: (id: number, open: boolean) => void;
@@ -56,8 +59,11 @@ function SidebarReportItem({
 }) {
   const hasChildren = report.children && report.children.length > 0;
   const isExpanded = expandedIds.has(report.id);
-  const isActive = selectedReport?.id === report.id;
-  const childSelected = hasSelectedChild(report, selectedReport?.id);
+  const isActive =
+    selectedReport?.id === report.id || highlightedChildId === report.id;
+  const childSelected =
+    hasSelectedChild(report, selectedReport?.id) ||
+    hasSelectedChild(report, highlightedChildId ?? undefined);
 
   return (
     <div
@@ -91,6 +97,7 @@ function SidebarReportItem({
               key={child.id}
               report={child}
               selectedReport={selectedReport}
+              highlightedChildId={highlightedChildId}
               onSelect={onSelect}
               expandedIds={expandedIds}
               setExpanded={setExpanded}
@@ -108,6 +115,7 @@ export function Sidebar({
   reports,
   isLoading,
   selectedReport,
+  highlightedChildId,
   onReportSelect,
   onLogout,
   rolId,
@@ -129,9 +137,8 @@ export function Sidebar({
     });
   };
 
-  // Auto-expandir todos los ancestros del reporte seleccionado
+  // Auto-expandir todos los ancestros del reporte seleccionado y del hijo destacado
   useEffect(() => {
-    if (!selectedReport) return;
     const idsToExpand: number[] = [];
     const findAncestors = (items: Report[], targetId: number): boolean => {
       for (const r of items) {
@@ -143,11 +150,12 @@ export function Sidebar({
       }
       return false;
     };
-    findAncestors(reports, selectedReport.id);
+    if (selectedReport) findAncestors(reports, selectedReport.id);
+    if (highlightedChildId) findAncestors(reports, highlightedChildId);
     if (idsToExpand.length > 0) {
       setExpandedIds((prev) => new Set([...prev, ...idsToExpand]));
     }
-  }, [selectedReport, reports]);
+  }, [selectedReport, highlightedChildId, reports]);
 
   const adminLinks = [
     { href: '/dashboard/admin/reports', label: 'Gestión de Reportes', icon: ClipboardList },
@@ -234,6 +242,7 @@ export function Sidebar({
                 key={report.id}
                 report={report}
                 selectedReport={selectedReport}
+                highlightedChildId={highlightedChildId}
                 onSelect={handleReportSelect}
                 expandedIds={expandedIds}
                 setExpanded={setExpanded}

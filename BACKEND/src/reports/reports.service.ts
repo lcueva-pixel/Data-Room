@@ -6,14 +6,14 @@ import { UpdateReportDto } from './dto/update-report.dto';
 import { ListReportsQueryDto } from './dto/list-reports-query.dto';
 import { buildPaginatedResponse } from '../common/dto/paginated-response.dto';
 
-const VALID_SORT_FIELDS = ['id', 'titulo', 'fechaRegistro'] as const;
+const VALID_SORT_FIELDS = ['id', 'titulo', 'fechaRegistro', 'orderIndex'] as const;
 type ValidSortField = (typeof VALID_SORT_FIELDS)[number];
 
 function toValidSortField(field?: string): ValidSortField {
   if (field && VALID_SORT_FIELDS.includes(field as ValidSortField)) {
     return field as ValidSortField;
   }
-  return 'id';
+  return 'orderIndex';
 }
 
 // Include para tabla admin — trae referencia al padre, conteo de hijos y usuarios con acceso
@@ -49,7 +49,7 @@ export class ReportsService {
         reportesRoles: { include: { rol: true } },
         reportesUsuarios: { select: { usuarioId: true } },
       },
-      orderBy: { id: 'asc' },
+      orderBy: { orderIndex: 'asc' },
     });
 
     return this.buildTree(allReports);
@@ -87,7 +87,7 @@ export class ReportsService {
         reportesUsuarios: { include: { usuario: { select: { id: true, email: true, nombreCompleto: true } } } },
         _count: { select: { children: true } },
       },
-      orderBy: { id: 'asc' },
+      orderBy: { orderIndex: 'asc' },
     });
   }
 
@@ -131,13 +131,28 @@ export class ReportsService {
       });
     }
 
+    // Invariante: un sub-reporte siempre debe tener URL.
+    if (dto.padreId != null && (dto.urlIframe == null || dto.urlIframe === '')) {
+      throw new BadRequestException(
+        'Un sub-reporte debe tener URL de Looker Studio',
+      );
+    }
+
+    // Calcular orderIndex: el nuevo reporte va al final de su nivel (entre hermanos del mismo padreId).
+    const maxOrder = await this.prisma.report.aggregate({
+      where: { padreId: dto.padreId ?? null },
+      _max: { orderIndex: true },
+    });
+    const nextOrderIndex = (maxOrder._max.orderIndex ?? 0) + 1;
+
     await this.prisma.report.create({
       data: {
         titulo: dto.titulo,
         descripcion: dto.descripcion,
-        urlIframe: dto.urlIframe,
+        urlIframe: dto.urlIframe ?? null,
         activo: dto.activo ?? true,
         padreId: dto.padreId ?? null,
+        orderIndex: nextOrderIndex,
         reportesRoles: {
           create: dto.rolesIds.map((rolId) => ({ rolId })),
         },
@@ -181,11 +196,32 @@ export class ReportsService {
       }
     }
 
+    // Invariante post-update: si el reporte queda como sub-reporte, debe tener URL.
+    // El estado resultante combina los campos del DTO (si vienen) con los actuales en BD.
+    const current = await this.prisma.report.findUniqueOrThrow({
+      where: { id },
+      select: { padreId: true, urlIframe: true },
+    });
+    const resultingPadreId =
+      dto.padreId !== undefined ? dto.padreId : current.padreId;
+    const resultingUrlIframe =
+      dto.urlIframe !== undefined ? dto.urlIframe : current.urlIframe;
+    if (
+      resultingPadreId != null &&
+      (resultingUrlIframe == null || resultingUrlIframe === '')
+    ) {
+      throw new BadRequestException(
+        'Un sub-reporte debe tener URL de Looker Studio',
+      );
+    }
+
     await this.prisma.report.update({
       where: { id },
       data: {
         ...(dto.titulo !== undefined && { titulo: dto.titulo }),
-        ...(dto.urlIframe !== undefined && { urlIframe: dto.urlIframe }),
+        ...(dto.urlIframe !== undefined && {
+          urlIframe: dto.urlIframe === '' ? null : dto.urlIframe,
+        }),
         ...(dto.descripcion !== undefined && { descripcion: dto.descripcion }),
         ...(dto.activo !== undefined && { activo: dto.activo }),
         ...(dto.padreId !== undefined && { padreId: dto.padreId }),
@@ -236,8 +272,63 @@ export class ReportsService {
     await this.logService.register({
       usuarioId: executorId,
       accion: 'DESACTIVAR_REPORTE',
-      detalle: `Reporte desactivado: id=${id}`,
+      detalle: `Desactivado: id=${id}`,
     });
     return { message: 'Reporte desactivado exitosamente' };
+  }
+
+  // ── Listado admin sin paginar (para modo "Reordenar") ────────────────
+  async findAllAdminFlat() {
+    return this.prisma.report.findMany({
+      include: REPORT_INCLUDE_ADMIN,
+      orderBy: { orderIndex: 'asc' },
+    });
+  }
+
+  // ── Reordenar hermanos en transacción ─────────────────────────────────
+  async reorder(
+    padreId: number | null,
+    orderedIds: number[],
+    executorId: number,
+  ) {
+    // Validación: no duplicados
+    const uniqueIds = new Set(orderedIds);
+    if (uniqueIds.size !== orderedIds.length) {
+      throw new BadRequestException('La lista contiene IDs duplicados');
+    }
+
+    // Validación: todos los IDs existen y son hermanos del mismo padreId
+    const found = await this.prisma.report.findMany({
+      where: { id: { in: orderedIds } },
+      select: { id: true, padreId: true },
+    });
+    if (found.length !== orderedIds.length) {
+      throw new BadRequestException('Algún reporte no existe');
+    }
+    const expected = padreId ?? null;
+    const allSiblings = found.every((r) => (r.padreId ?? null) === expected);
+    if (!allSiblings) {
+      throw new BadRequestException(
+        'Todos los reportes deben compartir el mismo padre',
+      );
+    }
+
+    // Reasignación atómica: orderIndex 1..N en transacción
+    await this.prisma.$transaction(
+      orderedIds.map((id, idx) =>
+        this.prisma.report.update({
+          where: { id },
+          data: { orderIndex: idx + 1 },
+        }),
+      ),
+    );
+
+    await this.logService.register({
+      usuarioId: executorId,
+      accion: 'REORDENAR_REPORTES',
+      detalle: `Reordenados ${orderedIds.length} reportes (padre=${padreId ?? 'raíz'})`,
+    });
+
+    return { message: 'Orden actualizado' };
   }
 }

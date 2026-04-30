@@ -3,6 +3,7 @@ import { ReportsService } from './reports.service';
 import { CreateReportDto } from './dto/create-report.dto';
 import { UpdateReportDto } from './dto/update-report.dto';
 import { ListReportsQueryDto } from './dto/list-reports-query.dto';
+import { ReorderReportsDto } from './dto/reorder-reports.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { AdminGuard } from '../auth/admin.guard';
 
@@ -22,10 +23,26 @@ export class ReportsController {
     return this.reportsService.findAllAdmin(query);
   }
 
+  @Get('admin/all-flat')
+  @UseGuards(AdminGuard)
+  async findAllAdminFlat() {
+    return this.reportsService.findAllAdminFlat();
+  }
+
   @Get(':id/children')
   @UseGuards(AdminGuard)
   async findChildren(@Param('id', ParseIntPipe) id: number) {
     return this.reportsService.findChildren(id);
+  }
+
+  @Patch('reorder')
+  @UseGuards(AdminGuard)
+  async reorder(@Body() dto: ReorderReportsDto, @Req() req: any) {
+    return this.reportsService.reorder(
+      dto.padreId ?? null,
+      dto.orderedIds,
+      req.user.userId,
+    );
   }
 
   @Post()

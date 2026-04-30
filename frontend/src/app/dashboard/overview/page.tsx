@@ -103,7 +103,7 @@ export default function OverviewPage() {
         reports={reports}
         isLoading={isLoading}
         selectedReport={null}
-        onReportSelect={() => router.push('/dashboard')}
+        onReportSelect={(report) => router.push(`/dashboard?reportId=${report.id}`)}
         onLogout={handleLogout}
         rolId={rolId}
         isOpen={sidebarOpen}
