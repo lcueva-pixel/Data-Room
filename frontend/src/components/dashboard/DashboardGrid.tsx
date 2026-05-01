@@ -43,11 +43,11 @@ export function DashboardGrid({
     <div ref={containerRef} key={parent.id} className="flex flex-col gap-6">
       {/* Header del padre — siempre visible (título + descripción) */}
       <header className="flex flex-col gap-1">
-        <h1 className="text-2xl font-bold text-slate-800 truncate">
+        <h1 className="text-2xl font-bold text-slate-800 dark:text-gray-100 truncate">
           {parent.titulo}
         </h1>
         {parent.descripcion && (
-          <p className="text-sm text-slate-500">{parent.descripcion}</p>
+          <p className="text-sm text-slate-500 dark:text-gray-400">{parent.descripcion}</p>
         )}
       </header>
 
@@ -58,7 +58,7 @@ export function DashboardGrid({
 
       {/* Grid de hijos */}
       {children.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-slate-300 bg-white p-10 text-center text-sm text-slate-400">
+        <div className="rounded-xl border border-dashed border-slate-300 dark:border-white/15 bg-white dark:bg-sidebar-hover p-10 text-center text-sm text-slate-400 dark:text-gray-500">
           Este reporte no tiene sub-reportes asociados.
         </div>
       ) : (
@@ -82,12 +82,12 @@ export function DashboardGrid({
 function ParentBanner({ urlIframe, titulo }: { urlIframe: string; titulo: string }) {
   const [isLoaded, setIsLoaded] = useState(false);
   return (
-    <div className="relative h-[300px] rounded-xl overflow-hidden border border-slate-200 bg-white shadow-sm">
+    <div className="relative h-[300px] rounded-xl overflow-hidden border border-slate-200 dark:border-white/10 bg-white dark:bg-sidebar-hover shadow-sm dark:shadow-black/30">
       {!isLoaded && (
-        <div className="absolute inset-0 flex items-center justify-center bg-slate-50 z-10">
+        <div className="absolute inset-0 flex items-center justify-center bg-slate-50 dark:bg-sidebar-hover z-10">
           <div className="flex flex-col items-center gap-2">
-            <div className="w-7 h-7 border-3 border-blue-600 border-t-transparent rounded-full animate-spin" />
-            <p className="text-xs text-slate-500">Cargando resumen...</p>
+            <div className="w-7 h-7 border-3 border-blue-600 dark:border-sidebar-accent border-t-transparent rounded-full animate-spin" />
+            <p className="text-xs text-slate-500 dark:text-gray-400">Cargando resumen...</p>
           </div>
         </div>
       )}
@@ -132,15 +132,15 @@ function ChildCard({ child, eager, highlighted, onOpenIsolated }: ChildCardProps
     <article
       data-child-id={child.id}
       className={clsx(
-        'flex flex-col rounded-xl border bg-white shadow-sm overflow-hidden transition-all duration-200',
+        'flex flex-col rounded-xl border bg-white dark:bg-sidebar-hover shadow-sm dark:shadow-black/30 overflow-hidden transition-all duration-200',
         highlighted
-          ? 'border-blue-500 ring-2 ring-blue-200'
-          : 'border-slate-200',
+          ? 'border-blue-500 dark:border-sidebar-accent ring-2 ring-blue-200 dark:ring-sidebar-accent/30'
+          : 'border-slate-200 dark:border-white/10',
       )}
     >
       {/* Header de tarjeta */}
-      <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-slate-100">
-        <h3 className="text-sm font-semibold text-slate-700 truncate">
+      <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-slate-100 dark:border-white/10">
+        <h3 className="text-sm font-semibold text-slate-700 dark:text-gray-100 truncate">
           {child.titulo}
         </h3>
         <div className="flex items-center gap-1.5 flex-shrink-0">
@@ -149,7 +149,7 @@ function ChildCard({ child, eager, highlighted, onOpenIsolated }: ChildCardProps
               href={url}
               target="_blank"
               rel="noopener noreferrer"
-              className="p-1.5 rounded-md text-slate-500 hover:bg-slate-100 hover:text-blue-600 transition-colors"
+              className="p-1.5 rounded-md text-slate-500 dark:text-gray-400 hover:bg-slate-100 dark:hover:bg-sidebar-main hover:text-blue-600 dark:hover:text-sidebar-accent transition-colors"
               aria-label="Abrir en nueva pestaña"
               title="Abrir en nueva pestaña"
             >
@@ -160,7 +160,7 @@ function ChildCard({ child, eager, highlighted, onOpenIsolated }: ChildCardProps
             <button
               type="button"
               onClick={() => onOpenIsolated(child)}
-              className="p-1.5 rounded-md text-slate-500 hover:bg-slate-100 hover:text-blue-600 transition-colors"
+              className="p-1.5 rounded-md text-slate-500 dark:text-gray-400 hover:bg-slate-100 dark:hover:bg-sidebar-main hover:text-blue-600 dark:hover:text-sidebar-accent transition-colors"
               aria-label="Abrir en pantalla completa"
               title="Abrir en pantalla completa"
             >
@@ -171,13 +171,13 @@ function ChildCard({ child, eager, highlighted, onOpenIsolated }: ChildCardProps
       </div>
 
       {/* Cuerpo: iframe + skeleton/error */}
-      <div className="relative aspect-video min-h-[400px] bg-slate-50">
+      <div className="relative aspect-video min-h-[400px] bg-slate-50 dark:bg-sidebar-main">
         {!url ? (
-          <div className="absolute inset-0 flex items-center justify-center text-sm text-slate-400">
+          <div className="absolute inset-0 flex items-center justify-center text-sm text-slate-400 dark:text-gray-500">
             Sin gráfico configurado
           </div>
         ) : hasError ? (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-sm text-slate-500 p-4 text-center">
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-sm text-slate-500 dark:text-gray-400 p-4 text-center">
             <p>No se pudo cargar el reporte.</p>
             <button
               type="button"
@@ -185,7 +185,7 @@ function ChildCard({ child, eager, highlighted, onOpenIsolated }: ChildCardProps
                 setHasError(false);
                 setIsLoaded(false);
               }}
-              className="text-xs text-blue-600 hover:text-blue-800 underline"
+              className="text-xs text-blue-600 dark:text-sidebar-accent hover:text-blue-800 dark:hover:text-sidebar-accent/80 underline"
             >
               Reintentar
             </button>
@@ -193,8 +193,8 @@ function ChildCard({ child, eager, highlighted, onOpenIsolated }: ChildCardProps
         ) : (
           <>
             {!isLoaded && (
-              <div className="absolute inset-0 flex items-center justify-center bg-slate-50 animate-pulse">
-                <div className="w-7 h-7 border-3 border-blue-600 border-t-transparent rounded-full animate-spin" />
+              <div className="absolute inset-0 flex items-center justify-center bg-slate-50 dark:bg-sidebar-main animate-pulse">
+                <div className="w-7 h-7 border-3 border-blue-600 dark:border-sidebar-accent border-t-transparent rounded-full animate-spin" />
               </div>
             )}
             <iframe

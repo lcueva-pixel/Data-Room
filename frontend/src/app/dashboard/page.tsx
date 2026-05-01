@@ -144,15 +144,15 @@ function DashboardPageInner() {
         <main className="flex-1 overflow-y-auto p-4 sm:p-6">
           {isLoading ? (
             <div className="flex flex-col gap-3 h-full">
-              <div className="h-6 w-48 bg-slate-200 rounded animate-pulse" />
+              <div className="h-6 w-48 bg-slate-200 dark:bg-white/10 rounded animate-pulse" />
               <div
-                className="flex-1 bg-slate-200 rounded-xl animate-pulse"
+                className="flex-1 bg-slate-200 dark:bg-white/10 rounded-xl animate-pulse"
                 style={{ minHeight: 'calc(100vh - 220px)' }}
               />
             </div>
           ) : error ? (
             <div className="flex items-center justify-center h-full">
-              <p className="text-red-500 text-sm">{error}</p>
+              <p className="text-red-500 dark:text-red-400 text-sm">{error}</p>
             </div>
           ) : selectedReport && esDashboard ? (
             <DashboardGrid
@@ -168,7 +168,7 @@ function DashboardPageInner() {
               urlIframe={selectedReport.urlIframe}
             />
           ) : (
-            <div className="flex flex-col items-center justify-center h-full gap-4 text-slate-400">
+            <div className="flex flex-col items-center justify-center h-full gap-4 text-slate-400 dark:text-gray-500">
               <LayoutDashboard className="w-16 h-16 opacity-30" />
               <div className="text-center">
                 <p className="text-lg font-medium">Sin reportes disponibles</p>

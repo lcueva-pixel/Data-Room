@@ -277,10 +277,17 @@ export function Sidebar({
 
         {/* ── Zona inferior ────────────────────────────────────────── */}
         <div className="px-3 py-4 border-t border-white/10 space-y-1">
-          <button className={clsx(NAV_BASE, 'w-full', NAV_INACTIVE)}>
+          <Link
+            href="/dashboard/configuracion"
+            onClick={onClose}
+            className={clsx(
+              NAV_BASE, 'w-full',
+              pathname === '/dashboard/configuracion' ? NAV_ACTIVE : NAV_INACTIVE,
+            )}
+          >
             <Settings className="w-4 h-4" />
             <span>Configuración</span>
-          </button>
+          </Link>
           <button
             onClick={onLogout}
             className={clsx(

@@ -23,7 +23,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
     <SessionProvider>
       <ThemeProvider
         attribute="class"
-        defaultTheme="light"
+        defaultTheme="system"
+        enableSystem
+        storageKey="dataroom-theme"
         disableTransitionOnChange
       >
         <QueryClientProvider client={queryClient}>
