@@ -40,9 +40,10 @@ model Report {
   id            Int      @id @default(autoincrement())
   titulo        String   @db.VarChar(100)
   descripcion   String?
-  urlIframe     String   @map("url_iframe")
+  urlIframe     String?  @map("url_iframe")
   activo        Boolean  @default(true)
   fechaRegistro DateTime @default(now()) @map("fecha_registro") @db.Timestamptz
+  orderIndex    Int      @default(0) @map("order_index")
 
   // ─── Jerarquía recursiva ───────────────────────────
   padreId  Int?     @map("padre_id")

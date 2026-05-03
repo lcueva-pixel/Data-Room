@@ -97,13 +97,13 @@ export default function OverviewPage() {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-100">
+    <div className="flex h-screen overflow-hidden bg-slate-100 dark:bg-sidebar-main">
       {/* Sidebar: clic en reporte → navega a /dashboard */}
       <Sidebar
         reports={reports}
         isLoading={isLoading}
         selectedReport={null}
-        onReportSelect={() => router.push('/dashboard')}
+        onReportSelect={(report) => router.push(`/dashboard?reportId=${report.id}`)}
         onLogout={handleLogout}
         rolId={rolId}
         isOpen={sidebarOpen}
@@ -116,40 +116,40 @@ export default function OverviewPage() {
 
         <main className="flex-1 overflow-y-auto p-6">
           {/* Breadcrumb de página */}
-          <div className="flex items-center gap-2 text-sm text-slate-500 mb-6">
+          <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-gray-400 mb-6">
             <span>Portal Construex</span>
             <ChevronRight className="w-4 h-4" />
-            <span className="text-slate-800 font-medium">Overview</span>
+            <span className="text-slate-800 dark:text-gray-100 font-medium">Overview</span>
           </div>
 
           {/* Contenedor de Bienvenida */}
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 mb-6">
-            <h1 className="text-3xl font-bold text-slate-800 mb-3">
+          <div className="bg-white dark:bg-sidebar-hover rounded-2xl border border-slate-200 dark:border-white/10 shadow-sm p-8 mb-6">
+            <h1 className="text-3xl font-bold text-slate-800 dark:text-gray-100 mb-3">
               Welcome to the Construex Portal
             </h1>
-            <p className="text-slate-500 text-base leading-relaxed mb-6">
+            <p className="text-slate-500 dark:text-gray-400 text-base leading-relaxed mb-6">
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
               incididunt ut labore et dolore magna aliqua.
             </p>
 
             {/* Alerta Amarilla — Strictly Confidential */}
-            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-3">
-              <p className="font-semibold text-amber-800 flex items-center gap-2 mb-1">
+            <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40 rounded-xl p-4 mb-3">
+              <p className="font-semibold text-amber-800 dark:text-amber-300 flex items-center gap-2 mb-1">
                 <AlertTriangle className="w-4 h-4 flex-shrink-0" />
                 Strictly Confidential
               </p>
-              <p className="text-amber-700 text-sm">
+              <p className="text-amber-700 dark:text-amber-200/80 text-sm">
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit.
               </p>
             </div>
 
             {/* Alerta Roja — Important Notice */}
-            <div className="bg-red-50 border border-red-200 rounded-xl p-4">
-              <p className="font-semibold text-red-800 flex items-center gap-2 mb-1">
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/40 rounded-xl p-4">
+              <p className="font-semibold text-red-800 dark:text-red-300 flex items-center gap-2 mb-1">
                 <ShieldAlert className="w-4 h-4 flex-shrink-0" />
                 Important Notice
               </p>
-              <p className="text-red-700 text-sm">
+              <p className="text-red-700 dark:text-red-200/80 text-sm">
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit.
               </p>
             </div>
