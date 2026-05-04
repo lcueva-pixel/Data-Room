@@ -247,15 +247,39 @@ export class ReportsService {
     return { message: 'Reporte actualizado exitosamente' };
   }
 
+  private async collectDescendantIds(parentId: number): Promise<number[]> {
+    const children = await this.prisma.report.findMany({
+      where: { padreId: parentId },
+      select: { id: true },
+    });
+    const ids: number[] = children.map((c) => c.id);
+    for (const child of children) {
+      ids.push(...(await this.collectDescendantIds(child.id)));
+    }
+    return ids;
+  }
+
   async toggleActivo(id: number, executorId: number) {
     const report = await this.prisma.report.findUniqueOrThrow({
       where: { id },
     });
+    const newActivo = !report.activo;
     const updated = await this.prisma.report.update({
       where: { id },
-      data: { activo: !report.activo },
+      data: { activo: newActivo },
       include: REPORT_INCLUDE_ADMIN,
     });
+
+    if (!newActivo) {
+      const descendantIds = await this.collectDescendantIds(id);
+      if (descendantIds.length > 0) {
+        await this.prisma.report.updateMany({
+          where: { id: { in: descendantIds } },
+          data: { activo: false },
+        });
+      }
+    }
+
     await this.logService.register({
       usuarioId: executorId,
       accion: 'TOGGLE_REPORTE',
