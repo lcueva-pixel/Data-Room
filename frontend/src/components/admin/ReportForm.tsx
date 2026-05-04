@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -9,19 +10,37 @@ import { ChildReportsSection } from '@/components/admin/ChildReportsSection';
 import { UserAccessSelector } from '@/components/admin/UserAccessSelector';
 import type { Report } from '@/types/report.types';
 
-const reportSchema = z.object({
-  titulo: z.string().min(1, 'El nombre del reporte es obligatorio').max(100),
-  urlIframe: z
-    .string()
-    .min(1, 'La URL es obligatoria')
-    .startsWith('https://', 'La URL debe comenzar con https://'),
-  descripcion: z.string().max(500).optional(),
-  rolesIds: z.array(z.number().int()).min(1, 'Selecciona al menos un rol'),
-  usuariosIds: z.array(z.number().int()),
-  activo: z.boolean(),
-});
+function buildSchema(esHijo: boolean) {
+  const urlIframe = esHijo
+    ? z
+        .string()
+        .min(1, 'La URL es obligatoria para sub-reportes')
+        .startsWith('https://', 'La URL debe comenzar con https://')
+    : z.union([
+        z.literal(''),
+        z
+          .string()
+          .startsWith('https://', 'La URL debe comenzar con https://'),
+      ]);
 
-type ReportFormValues = z.infer<typeof reportSchema>;
+  return z.object({
+    titulo: z.string().min(1, 'El nombre del reporte es obligatorio').max(100),
+    urlIframe,
+    descripcion: z.string().max(500).optional(),
+    rolesIds: z.array(z.number().int()).min(1, 'Selecciona al menos un rol'),
+    usuariosIds: z.array(z.number().int()),
+    activo: z.boolean(),
+  });
+}
+
+type ReportFormValues = {
+  titulo: string;
+  urlIframe: string;
+  descripcion?: string;
+  rolesIds: number[];
+  usuariosIds: number[];
+  activo: boolean;
+};
 
 interface ReportFormProps {
   onSuccess: () => void;
@@ -35,6 +54,12 @@ export function ReportForm({ onSuccess, onCancel, initialValues, lockedParentId 
   const { createReport, updateReport } = useAdminReports();
   const isEditing = !!initialValues;
 
+  // Determina si el reporte es (o será) un sub-reporte: si viene `lockedParentId`
+  // (modal "Agregar Sub-reporte") o si el reporte que se edita ya tiene padre.
+  const esHijo = lockedParentId != null || initialValues?.padreId != null;
+
+  const schema = useMemo(() => buildSchema(esHijo), [esHijo]);
+
   const {
     register,
     handleSubmit,
@@ -44,23 +69,26 @@ export function ReportForm({ onSuccess, onCancel, initialValues, lockedParentId 
     formState: { errors, isSubmitting },
     setError,
   } = useForm<ReportFormValues>({
-    resolver: zodResolver(reportSchema),
+    resolver: zodResolver(schema),
     defaultValues: isEditing
       ? {
           titulo: initialValues.titulo,
-          urlIframe: initialValues.urlIframe,
+          urlIframe: initialValues.urlIframe ?? '',
           descripcion: initialValues.descripcion ?? '',
           rolesIds: initialValues.reportesRoles.map((r) => r.rolId),
           usuariosIds: initialValues.reportesUsuarios?.map((ru) => ru.usuarioId) ?? [],
           activo: initialValues.activo,
         }
-      : { activo: true, rolesIds: [] as number[], usuariosIds: [] as number[] },
+      : { titulo: '', urlIframe: '', activo: true, rolesIds: [] as number[], usuariosIds: [] as number[] },
   });
 
   const onSubmit = async (data: ReportFormValues) => {
     try {
+      // Normaliza URL vacía → undefined (no '') para que el backend respete @IsOptional.
+      const { urlIframe, ...rest } = data;
       const payload = {
-        ...data,
+        ...rest,
+        ...(urlIframe !== '' && { urlIframe }),
         ...(lockedParentId != null && { padreId: lockedParentId }),
       };
 
@@ -100,13 +128,23 @@ export function ReportForm({ onSuccess, onCancel, initialValues, lockedParentId 
       {/* URL */}
       <div>
         <label className={labelClass}>
-          URL de Looker Studio <span className="text-red-500">*</span>
+          URL de Looker Studio{' '}
+          {esHijo ? (
+            <span className="text-red-500">*</span>
+          ) : (
+            <span className="text-slate-400 font-normal">(opcional)</span>
+          )}
         </label>
         <input
           {...register('urlIframe')}
           placeholder="https://lookerstudio.google.com/..."
           className={inputClass}
         />
+        {!esHijo && (
+          <p className="text-xs text-slate-500 dark:text-gray-400 mt-1">
+            Opcional para reportes principales. Si se proporciona, se usa como gráfico-resumen del dashboard.
+          </p>
+        )}
         {errors.urlIframe && <p className={errorClass}>{errors.urlIframe.message}</p>}
       </div>
 

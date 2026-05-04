@@ -1,4 +1,13 @@
-import { IsString, IsBoolean, IsOptional, IsArray, IsInt, ArrayMinSize, Matches } from 'class-validator';
+import {
+  IsString,
+  IsBoolean,
+  IsOptional,
+  IsArray,
+  IsInt,
+  ArrayMinSize,
+  Matches,
+  ValidateIf,
+} from 'class-validator';
 
 export class CreateReportDto {
   @IsString()
@@ -8,11 +17,19 @@ export class CreateReportDto {
   @IsOptional()
   descripcion?: string;
 
-  @IsString()
+  // urlIframe es obligatorio si es sub-reporte (padreId != null) o si el padre lo proporcionó.
+  // Si es padre y no se proporciona, queda como null (banner del dashboard ausente).
+  @ValidateIf(
+    (o) =>
+      (o.padreId !== undefined && o.padreId !== null) ||
+      (o.urlIframe !== undefined && o.urlIframe !== ''),
+  )
+  @IsString({ message: 'La URL es obligatoria para sub-reportes' })
   @Matches(/^https:\/\//, {
     message: 'La URL del iframe debe comenzar con https://',
   })
-  urlIframe: string;
+  @IsOptional()
+  urlIframe?: string;
 
   @IsArray()
   @IsInt({ each: true })

@@ -31,7 +31,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         reports={reports}
         isLoading={isLoading}
         selectedReport={null}
-        onReportSelect={() => router.push('/dashboard')}
+        onReportSelect={(report) => router.push(`/dashboard?reportId=${report.id}`)}
         onLogout={handleLogout}
         rolId={rolId}
         isOpen={sidebarOpen}

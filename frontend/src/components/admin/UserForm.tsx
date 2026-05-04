@@ -104,16 +104,16 @@ export function UserForm({ initialValues, onSuccess, onCancel }: UserFormProps) 
   };
 
   const inputClass =
-    'w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent';
-  const errorClass = 'text-red-500 text-xs mt-1';
-  const labelClass = 'block text-sm font-medium text-slate-700 mb-1';
+    'w-full px-3 py-2 border border-slate-300 dark:border-white/20 rounded-lg text-sm bg-white dark:bg-sidebar-main text-slate-800 dark:text-gray-100 placeholder:text-slate-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-sidebar-accent/60 focus:border-transparent';
+  const errorClass = 'text-red-500 dark:text-red-400 text-xs mt-1';
+  const labelClass = 'block text-sm font-medium text-slate-700 dark:text-gray-300 mb-1';
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       {/* Nombre completo */}
       <div>
         <label className={labelClass}>
-          Nombre completo <span className="text-red-500">*</span>
+          Nombre completo <span className="text-red-500 dark:text-red-400">*</span>
         </label>
         <input {...register('nombreCompleto')} placeholder="Juan Pérez" className={inputClass} />
         {errors.nombreCompleto && <p className={errorClass}>{errors.nombreCompleto.message}</p>}
@@ -122,7 +122,7 @@ export function UserForm({ initialValues, onSuccess, onCancel }: UserFormProps) 
       {/* Correo */}
       <div>
         <label className={labelClass}>
-          Correo electrónico <span className="text-red-500">*</span>
+          Correo electrónico <span className="text-red-500 dark:text-red-400">*</span>
         </label>
         <input
           {...register('email')}
@@ -137,7 +137,7 @@ export function UserForm({ initialValues, onSuccess, onCancel }: UserFormProps) 
       <div className="grid grid-cols-2 gap-3">
         <div>
           <label className={labelClass}>
-            Contraseña {isEditing ? <span className="text-slate-400 font-normal">(opcional)</span> : <span className="text-red-500">*</span>}
+            Contraseña {isEditing ? <span className="text-slate-400 dark:text-gray-500 font-normal">(opcional)</span> : <span className="text-red-500 dark:text-red-400">*</span>}
           </label>
           <div className="relative">
             <input
@@ -149,7 +149,7 @@ export function UserForm({ initialValues, onSuccess, onCancel }: UserFormProps) 
             <button
               type="button"
               onClick={() => setShowPass((v) => !v)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-gray-500 hover:text-slate-600 dark:hover:text-gray-300"
             >
               {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
@@ -168,7 +168,7 @@ export function UserForm({ initialValues, onSuccess, onCancel }: UserFormProps) 
             <button
               type="button"
               onClick={() => setShowConfirm((v) => !v)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-gray-500 hover:text-slate-600 dark:hover:text-gray-300"
             >
               {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
@@ -177,13 +177,13 @@ export function UserForm({ initialValues, onSuccess, onCancel }: UserFormProps) 
         </div>
       </div>
       {!isEditing && (
-        <p className="text-slate-400 text-xs -mt-2">Mín. 6 caracteres, 1 mayúscula y 1 número</p>
+        <p className="text-slate-400 dark:text-gray-500 text-xs -mt-2">Mín. 6 caracteres, 1 mayúscula y 1 número</p>
       )}
 
       {/* Rol */}
       <div>
         <label className={labelClass}>
-          Rol del usuario <span className="text-red-500">*</span>
+          Rol del usuario <span className="text-red-500 dark:text-red-400">*</span>
         </label>
         <select
           {...register('rolId', { valueAsNumber: true })}
@@ -206,16 +206,16 @@ export function UserForm({ initialValues, onSuccess, onCancel }: UserFormProps) 
           {...register('activo')}
           type="checkbox"
           id="usuarioActivo"
-          className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+          className="w-4 h-4 rounded border-slate-300 dark:border-white/20 text-blue-600 dark:text-sidebar-accent focus:ring-blue-500 dark:focus:ring-sidebar-accent/60"
         />
-        <label htmlFor="usuarioActivo" className="text-sm text-slate-700">
+        <label htmlFor="usuarioActivo" className="text-sm text-slate-700 dark:text-gray-300">
           Usuario activo
         </label>
       </div>
 
       {/* Error global */}
       {errors.root && (
-        <p className="text-red-500 text-sm bg-red-50 px-3 py-2 rounded-lg">
+        <p className="text-red-500 dark:text-red-400 text-sm bg-red-50 dark:bg-red-900/20 border border-transparent dark:border-red-800/40 px-3 py-2 rounded-lg">
           {errors.root.message}
         </p>
       )}
@@ -226,7 +226,7 @@ export function UserForm({ initialValues, onSuccess, onCancel }: UserFormProps) 
           <button
             type="button"
             onClick={onCancel}
-            className="px-4 py-2 border border-slate-300 rounded-lg text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+            className="px-4 py-2 border border-slate-300 dark:border-white/20 rounded-lg text-sm text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-sidebar-main transition-colors"
           >
             Cancelar
           </button>
@@ -234,7 +234,7 @@ export function UserForm({ initialValues, onSuccess, onCancel }: UserFormProps) 
           <button
             type="button"
             onClick={handleLimpiar}
-            className="px-4 py-2 border border-slate-300 rounded-lg text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+            className="px-4 py-2 border border-slate-300 dark:border-white/20 rounded-lg text-sm text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-sidebar-main transition-colors"
           >
             Limpiar
           </button>
@@ -242,7 +242,7 @@ export function UserForm({ initialValues, onSuccess, onCancel }: UserFormProps) 
         <button
           type="submit"
           disabled={isSubmitting}
-          className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-60 transition-colors"
+          className="flex-1 px-4 py-2 bg-blue-600 dark:bg-sidebar-accent dark:text-sidebar-main text-white rounded-lg text-sm font-medium hover:bg-blue-700 dark:hover:bg-sidebar-accent/90 disabled:opacity-60 transition-colors"
         >
           {isSubmitting
             ? 'Guardando...'
