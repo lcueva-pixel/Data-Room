@@ -10,6 +10,7 @@ import type {
   UpdateReportPayload,
   PaginatedReports,
   ReportListQuery,
+  ReorderReportsPayload,
 } from '@/types/report.types';
 
 export function useAdminReports(initialQuery?: ReportListQuery) {
@@ -95,6 +96,21 @@ export function useAdminReports(initialQuery?: ReportListQuery) {
     },
   });
 
+  const reorderMutation = useMutation({
+    mutationFn: (payload: ReorderReportsPayload) =>
+      api.patch('/reports/reorder', payload).then((r) => r.data),
+    onSuccess: () => {
+      invalidate();
+      queryClient.invalidateQueries({ queryKey: ['admin-reports-flat'] });
+      window.dispatchEvent(new Event('refresh-reports'));
+      toast.success('Orden actualizado');
+    },
+    onError: (error: any) => {
+      const msg = error?.response?.data?.message;
+      toast.error(Array.isArray(msg) ? msg.join(', ') : msg ?? 'Error al actualizar el orden');
+    },
+  });
+
   return {
     reports: data?.data ?? [],
     meta: data?.meta,
@@ -110,6 +126,14 @@ export function useAdminReports(initialQuery?: ReportListQuery) {
       updateMutation.mutateAsync({ id, payload }),
     toggleActivo: toggleMutation.mutateAsync,
     deleteReport: deleteMutation.mutateAsync,
+    reorderReports: reorderMutation.mutateAsync,
     refetch,
   };
+}
+
+export function useAdminReportsFlat() {
+  return useQuery({
+    queryKey: ['admin-reports-flat'],
+    queryFn: () => api.get<Report[]>('/reports/admin/all-flat').then((r) => r.data),
+  });
 }

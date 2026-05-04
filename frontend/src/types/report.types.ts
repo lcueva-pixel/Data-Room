@@ -18,10 +18,11 @@ export interface Report {
   id: number;
   titulo: string;
   descripcion: string | null;
-  urlIframe: string;
+  urlIframe: string | null;
   activo: boolean;
   fechaRegistro: string;
   padreId: number | null;
+  orderIndex: number;
   reportesRoles: ReportRole[];
   reportesUsuarios?: ReportUserAccess[];
   children?: Report[];
@@ -29,10 +30,15 @@ export interface Report {
   _count?: { children: number };
 }
 
+export interface ReorderReportsPayload {
+  padreId: number | null;
+  orderedIds: number[];
+}
+
 
 export interface CreateReportPayload {
   titulo: string;
-  urlIframe: string;
+  urlIframe?: string;
   descripcion?: string;
   rolesIds: number[];
   usuariosIds?: number[];
@@ -42,7 +48,7 @@ export interface CreateReportPayload {
 
 export interface UpdateReportPayload {
   titulo?: string;
-  urlIframe?: string;
+  urlIframe?: string | null;
   descripcion?: string;
   rolesIds?: number[];
   usuariosIds?: number[];

@@ -18,7 +18,7 @@ export const {
       },
       async authorize(credentials) {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
+          `${process.env.BACKEND_URL}/autenticacion/login`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
