@@ -51,9 +51,15 @@ export function DashboardGrid({
         )}
       </header>
 
-      {/* Banda superior con iframe del padre (si existe) */}
-      {parent.urlIframe && (
+      {/* Banda superior con iframe del padre (solo si la URL es válida) */}
+      {parent.urlIframe && parent.urlIframe.startsWith('http') ? (
         <ParentBanner urlIframe={parent.urlIframe} titulo={parent.titulo} />
+      ) : (
+        <div className="rounded-xl border border-dashed border-slate-200 dark:border-white/10 bg-white dark:bg-sidebar-hover py-8 px-6 flex items-center justify-center">
+          <p className="text-sm text-slate-500 dark:text-gray-400 text-center">
+            Dashboard Principal — Seleccione un sub-reporte para visualizar los datos
+          </p>
+        </div>
       )}
 
       {/* Grid de hijos */}
