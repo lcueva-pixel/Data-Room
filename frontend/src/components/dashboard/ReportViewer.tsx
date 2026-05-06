@@ -42,7 +42,7 @@ export function ReportViewer({ reportId, titulo, urlIframe }: ReportViewerProps)
       <div className="flex items-center justify-between mb-3">
         <h2 className="text-lg font-semibold text-slate-700 dark:text-gray-100 truncate">{titulo}</h2>
         <a
-          href={urlIframe}
+          href={urlIframe as string}
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center gap-1.5 text-xs text-blue-600 dark:text-sidebar-accent hover:text-blue-800 dark:hover:text-sidebar-accent/80 transition-colors flex-shrink-0 ml-4"
@@ -64,7 +64,7 @@ export function ReportViewer({ reportId, titulo, urlIframe }: ReportViewerProps)
           </div>
         )}
         <iframe
-          src={urlIframe}
+          src={urlIframe as string}
           title={titulo}
           className="w-full h-full"
           style={{ minHeight: 'calc(100vh - 220px)' }}

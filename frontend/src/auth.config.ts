@@ -14,7 +14,7 @@ export const authConfig: NextAuthConfig = {
         token.backendTokenExp = user.backendTokenExp;
       }
       // Detectar expiración real del JWT del backend en cada verificación de sesión
-      if (token.backendTokenExp && Date.now() > token.backendTokenExp * 1000) {
+      if (token.backendTokenExp && Date.now() > Number(token.backendTokenExp) * 1000) {
         return { ...token, error: 'RefreshAccessTokenError' };
       }
       return token;
@@ -25,7 +25,7 @@ export const authConfig: NextAuthConfig = {
         session.user.id = token.userId as string;
       }
       (session as any).backendToken = token.backendToken;
-      session.error = token.error;
+      session.error = token.error as string | undefined;
       return session;
     },
     authorized({ auth, request: { nextUrl } }) {
