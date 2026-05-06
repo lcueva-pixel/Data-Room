@@ -33,12 +33,23 @@ export const {
 
         const data = await res.json();
 
+        let backendTokenExp = 0;
+        try {
+          const payload = JSON.parse(
+            Buffer.from(data.access_token.split('.')[1], 'base64').toString('utf-8'),
+          );
+          backendTokenExp = payload.exp ?? 0;
+        } catch {
+          backendTokenExp = 0;
+        }
+
         return {
           id: String(data.user.id),
           email: data.user.email,
           name: data.user.nombreCompleto,
           rol_id: data.user.rol_id,
           backendToken: data.access_token,
+          backendTokenExp,
         };
       },
     }),

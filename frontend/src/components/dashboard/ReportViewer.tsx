@@ -14,7 +14,9 @@ export function ReportViewer({ reportId, titulo, urlIframe }: ReportViewerProps)
   useReportTracking(reportId);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  if (!urlIframe) {
+  const urlValida = Boolean(urlIframe && urlIframe.trim() !== '' && urlIframe.startsWith('http'));
+
+  if (!urlValida) {
     return (
       <div className="flex flex-col h-full">
         <div className="flex items-center justify-between mb-3">
@@ -23,10 +25,10 @@ export function ReportViewer({ reportId, titulo, urlIframe }: ReportViewerProps)
         <div className="flex-1 rounded-xl border border-dashed border-slate-300 dark:border-white/15 bg-white dark:bg-sidebar-hover flex items-center justify-center">
           <div className="text-center px-6">
             <p className="text-sm text-slate-500 dark:text-gray-400">
-              Este reporte no tiene gráfico configurado.
+              Este reporte está siendo configurado.
             </p>
             <p className="text-xs text-slate-400 dark:text-gray-500 mt-1">
-              Si es un reporte principal, agrégale sub-reportes para verlos como dashboard.
+              Contacte al administrador si necesita acceso.
             </p>
           </div>
         </div>
