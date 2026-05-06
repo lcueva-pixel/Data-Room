@@ -4,10 +4,12 @@ declare module 'next-auth' {
   interface User {
     rol_id: number;
     backendToken: string;
+    backendTokenExp: number;
   }
 
   interface Session {
     backendToken: string;
+    error?: string;
     user: {
       id: string;
       name: string;
@@ -22,5 +24,7 @@ declare module 'next-auth/jwt' {
     rol_id: number;
     backendToken: string;
     userId: string;
+    backendTokenExp: number;
+    error?: string;
   }
 }

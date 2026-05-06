@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { SessionGuard } from '@/components/auth/SessionGuard';
 
 export const metadata: Metadata = {
   title: 'Dashboard — Data Room',
@@ -9,5 +10,5 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  return <SessionGuard>{children}</SessionGuard>;
 }
