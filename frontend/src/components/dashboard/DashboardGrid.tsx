@@ -12,6 +12,10 @@ interface DashboardGridProps {
   onScrollHandled?: () => void;
 }
 
+// Solicitud urgente de Analítica: para este dashboard puntual no se debe
+// mostrar la banda superior del padre, solo la grilla de hijos.
+const HIDE_PARENT_BANNER_REPORT_IDS = new Set<number>([21]);
+
 function getGridClasses(count: number): string {
   if (count <= 1) return 'grid grid-cols-1';
   if (count === 2) return 'grid grid-cols-1 md:grid-cols-2';
@@ -27,6 +31,7 @@ export function DashboardGrid({
 }: DashboardGridProps) {
   const children = parent.children ?? [];
   const containerRef = useRef<HTMLDivElement>(null);
+  const hideParentBanner = HIDE_PARENT_BANNER_REPORT_IDS.has(parent.id);
 
   useEffect(() => {
     if (!scrollTargetId || !containerRef.current) return;
@@ -51,16 +56,18 @@ export function DashboardGrid({
         )}
       </header>
 
-      {/* Banda superior con iframe del padre (solo si la URL es válida) */}
-      {parent.urlIframe && parent.urlIframe.startsWith('http') ? (
-        <ParentBanner urlIframe={parent.urlIframe} titulo={parent.titulo} />
-      ) : (
-        <div className="rounded-xl border border-dashed border-slate-200 dark:border-white/10 bg-white dark:bg-sidebar-hover py-8 px-6 flex items-center justify-center">
-          <p className="text-sm text-slate-500 dark:text-gray-400 text-center">
-            Dashboard Principal — Seleccione un sub-reporte para visualizar los datos
-          </p>
-        </div>
-      )}
+      {/* Banda superior con iframe del padre (solo si la URL es válida).
+          Se omite por completo para los dashboards en HIDE_PARENT_BANNER_REPORT_IDS. */}
+      {!hideParentBanner &&
+        (parent.urlIframe && parent.urlIframe.startsWith('http') ? (
+          <ParentBanner urlIframe={parent.urlIframe} titulo={parent.titulo} />
+        ) : (
+          <div className="rounded-xl border border-dashed border-slate-200 dark:border-white/10 bg-white dark:bg-sidebar-hover py-8 px-6 flex items-center justify-center">
+            <p className="text-sm text-slate-500 dark:text-gray-400 text-center">
+              Dashboard Principal — Seleccione un sub-reporte para visualizar los datos
+            </p>
+          </div>
+        ))}
 
       {/* Grid de hijos */}
       {children.length === 0 ? (
